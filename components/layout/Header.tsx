@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useCart } from "@/lib/cart/CartProvider";
 import { SignOutButton } from "@/components/auth/SignOutButton";
-import { STORE_NAME } from "@/lib/config";
 
 export function Header({
   userEmail,
@@ -17,8 +16,13 @@ export function Header({
   return (
     <header className="border-b border-ink/10 bg-white">
       <div className="container-page flex h-16 items-center justify-between">
-        <Link href="/" className="font-serif text-xl text-wine">
-          {STORE_NAME}
+        <Link href="/" className="block h-full w-32">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/navbar/logo_navbar.png"
+            alt="Taz Trends"
+            className="h-full w-full object-contain"
+          />
         </Link>
 
         <nav className="flex items-center gap-4 text-sm">
