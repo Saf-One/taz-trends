@@ -5,7 +5,7 @@
  */
 
 export const STORE_NAME =
-  process.env.NEXT_PUBLIC_STORE_NAME?.trim() || "Ethnica";
+  process.env.NEXT_PUBLIC_STORE_NAME?.trim() || "Taz Trends";
 
 // Currency is INR only (settled). Money is integer paise everywhere.
 export const CURRENCY = "INR" as const;
