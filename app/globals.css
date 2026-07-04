@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  @apply bg-blush text-ink;
+}
+
+.container-page {
+  @apply mx-auto w-full max-w-6xl px-4;
+}
+
+.btn {
+  @apply inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+.btn-primary {
+  @apply btn bg-wine text-white hover:bg-wine/90;
+}
+
+.btn-outline {
+  @apply btn border border-wine/40 text-wine hover:bg-wine/5;
+}
+
+.input {
+  @apply w-full rounded-md border border-ink/20 bg-white px-3 py-2 text-sm outline-none focus:border-wine;
+}
+
+.card {
+  @apply rounded-lg border border-ink/10 bg-white;
+}

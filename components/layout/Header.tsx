@@ -1,0 +1,55 @@
+"use client";
+
+import Link from "next/link";
+import { useCart } from "@/lib/cart/CartProvider";
+import { SignOutButton } from "@/components/auth/SignOutButton";
+import { STORE_NAME } from "@/lib/config";
+
+export function Header({
+  userEmail,
+  isAdmin,
+}: {
+  userEmail: string | null;
+  isAdmin: boolean;
+}) {
+  const { count } = useCart();
+
+  return (
+    <header className="border-b border-ink/10 bg-white">
+      <div className="container-page flex h-16 items-center justify-between">
+        <Link href="/" className="font-serif text-xl text-wine">
+          {STORE_NAME}
+        </Link>
+
+        <nav className="flex items-center gap-4 text-sm">
+          <Link href="/" className="hover:text-wine">
+            Shop
+          </Link>
+          <Link href="/quote" className="hover:text-wine">
+            Request a quote
+          </Link>
+          {isAdmin && (
+            <Link href="/admin" className="hover:text-wine">
+              Admin
+            </Link>
+          )}
+          <Link href="/cart" className="relative hover:text-wine">
+            Cart
+            {count > 0 && (
+              <span className="ml-1 rounded-full bg-wine px-1.5 py-0.5 text-xs text-white">
+                {count}
+              </span>
+            )}
+          </Link>
+          {userEmail ? (
+            <SignOutButton />
+          ) : (
+            <Link href="/sign-in" className="btn-outline">
+              Sign in
+            </Link>
+          )}
+        </nav>
+      </div>
+    </header>
+  );
+}
