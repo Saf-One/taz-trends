@@ -11,6 +11,7 @@ const config: Config = {
       colors: {
         ink: "#1a1414",
         blush: "#f7ede8",
+        "logo-bg": "#f8f2e7",
         wine: "#7b2d3b",
         gold: "#b08d57",
       },
