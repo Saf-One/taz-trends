@@ -14,7 +14,7 @@ export function Header({
   const { count } = useCart();
 
   return (
-    <header className="border-b border-ink/10 bg-white">
+    <header className="border-b border-ink/10">
       <div className="container-page flex h-16 items-center justify-between">
         <Link href="/" className="block h-full w-32">
           {/* eslint-disable-next-line @next/next/no-img-element */}
