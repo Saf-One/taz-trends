@@ -19,7 +19,18 @@ export default async function ShopLayout({
             isAdmin={profile?.is_admin ?? false}
           />
         </div>
-        <div className="container-page flex-1 py-8">{children}</div>
+        <div
+          className="container-page flex-1 py-8"
+          style={{
+            backgroundImage: 'url(/images/body/logo_flower.png)',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            backgroundAttachment: 'fixed',
+            backgroundSize: 'auto',
+          }}
+        >
+          {children}
+        </div>
         <footer className="border-t border-ink/10 bg-logo-bg py-6 text-center text-xs text-ink/50">
           <div className="mb-2 flex justify-center">
             <div className="w-24">
