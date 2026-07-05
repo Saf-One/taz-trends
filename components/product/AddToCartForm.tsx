@@ -41,26 +41,31 @@ export function AddToCartForm({ product }: { product: ProductWithRelations }) {
       <p className="text-xl text-wine">{formatPaise(unitPaise)}</p>
 
       {hasVariants && (
-        <label className="block">
-          <span className="mb-1 block text-sm text-ink/70">
+        <div className="block">
+          <span className="mb-2 block text-sm text-ink/70">
             {variants[0].variant_name}
           </span>
-          <select
-            className="input"
-            value={variantId ?? ""}
-            onChange={(e) => {
-              setVariantId(e.target.value);
-              setAdded(false);
-            }}
-          >
+          <div className="flex flex-wrap gap-2">
             {variants.map((v) => (
-              <option key={v.id} value={v.id} disabled={v.stock <= 0}>
+              <button
+                key={v.id}
+                type="button"
+                onClick={() => {
+                  setVariantId(v.id);
+                  setAdded(false);
+                }}
+                disabled={v.stock <= 0}
+                className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                  variantId === v.id
+                    ? "bg-wine text-white"
+                    : "border border-wine/40 text-wine hover:bg-wine/5 disabled:border-ink/20 disabled:text-ink/30"
+                } disabled:cursor-not-allowed`}
+              >
                 {v.variant_value}
-                {v.stock <= 0 ? " — sold out" : ""}
-              </option>
+              </button>
             ))}
-          </select>
-        </label>
+          </div>
+        </div>
       )}
 
       <label className="block">

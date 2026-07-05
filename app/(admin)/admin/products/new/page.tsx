@@ -8,7 +8,6 @@ export default function NewProductPage() {
       <h1 className="mb-6 font-serif text-2xl text-ink">New product</h1>
       <form action={createProduct} className="card space-y-4 p-6">
         <Field name="title" label="Title" required />
-        <Field name="slug" label="Slug (unique, url-safe)" required />
         <label className="block">
           <span className="mb-1 block text-sm text-ink/70">Description</span>
           <textarea name="description" className="input min-h-20" />

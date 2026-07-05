@@ -10,11 +10,21 @@ function rupeesToPaise(v: FormDataEntryValue | null): number {
   return Math.round((isFinite(n) ? n : 0) * 100);
 }
 
+function generateSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
 /** Create a product. Simple-product default: price + stock on the row. */
 export async function createProduct(formData: FormData) {
   const supabase = createSupabaseServerClient();
   const title = String(formData.get("title") ?? "").trim();
-  const slug = String(formData.get("slug") ?? "").trim();
+  const slug = generateSlug(title);
 
   const { data, error } = await supabase
     .from("products")
