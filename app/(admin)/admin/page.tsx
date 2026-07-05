@@ -162,7 +162,7 @@ export default async function AdminHome() {
   ];
 
   return (
-    <div className="animate-fade-in space-y-8">
+    <div className="space-y-8">
       {/* Page header */}
       <div className="flex items-center justify-between">
         <h1 className="font-serif text-2xl text-ink">Dashboard</h1>
@@ -177,7 +177,7 @@ export default async function AdminHome() {
           <Link
             key={c.label}
             href={c.href}
-            className="card card-hover group p-4 transition-all"
+            className="card card-hover group p-4"
           >
             <div className="mb-2 flex items-center justify-between">
               <span className={c.color}>{c.icon}</span>

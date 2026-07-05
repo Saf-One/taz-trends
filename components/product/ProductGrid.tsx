@@ -1,17 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import type { ProductWithRelations } from "@/types/db";
 import { ProductCard } from "./ProductCard";
-
-const CATEGORY_FILTERS = [
-  "All",
-  "Sarees",
-  "Suits",
-  "Lehengas",
-  "Kurtis",
-  "Accessories",
-] as const;
 
 const PRICE_FILTERS = [
   { label: "All", min: 0, max: Infinity },
@@ -20,17 +11,6 @@ const PRICE_FILTERS = [
   { label: "₹3,000 – ₹5,000", min: 300000, max: 500000 },
   { label: "Above ₹5,000", min: 500000, max: Infinity },
 ] as const;
-
-function matchesCategory(
-  product: ProductWithRelations,
-  category: string,
-): boolean {
-  if (category === "All") return true;
-  const search = category.toLowerCase();
-  const title = product.title.toLowerCase();
-  const slug = product.slug.toLowerCase();
-  return title.includes(search) || slug.includes(search);
-}
 
 function matchesPriceRange(
   product: ProductWithRelations,
@@ -47,22 +27,42 @@ function matchesPriceRange(
   return product.price >= min && product.price <= max;
 }
 
+function matchesSearch(
+  product: ProductWithRelations,
+  query: string,
+): boolean {
+  if (!query) return true;
+  const q = query.toLowerCase();
+  const title = product.title.toLowerCase();
+  const description = (product.description ?? "").toLowerCase();
+  return title.includes(q) || description.includes(q);
+}
+
 export function ProductGrid({
   products,
+  searchQuery: initialQuery = "",
 }: {
   products: ProductWithRelations[];
+  searchQuery?: string;
 }) {
-  const [categoryFilter, setCategoryFilter] = useState("All");
+  const [query, setQuery] = useState(initialQuery);
   const [priceFilterIndex, setPriceFilterIndex] = useState(0);
+
+  // Sync incoming URL search param into local state
+  useEffect(() => {
+    setQuery(initialQuery);
+  }, [initialQuery]);
 
   const filtered = useMemo(() => {
     const pf = PRICE_FILTERS[priceFilterIndex];
     return products.filter((p) => {
-      if (!matchesCategory(p, categoryFilter)) return false;
+      if (!matchesSearch(p, query)) return false;
       if (!matchesPriceRange(p, pf.min, pf.max)) return false;
       return true;
     });
-  }, [products, categoryFilter, priceFilterIndex]);
+  }, [products, query, priceFilterIndex]);
+
+  const hasFilters = query || priceFilterIndex > 0;
 
   if (products.length === 0) {
     return (
@@ -72,27 +72,15 @@ export function ProductGrid({
     );
   }
 
+  const clearFilters = () => {
+    setQuery("");
+    setPriceFilterIndex(0);
+  };
+
   return (
     <div>
       {/* Filter bar */}
       <div className="mb-4 space-y-3">
-        {/* Category pills */}
-        <div className="flex flex-wrap items-center gap-1.5">
-          {CATEGORY_FILTERS.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setCategoryFilter(cat)}
-              className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-                categoryFilter === cat
-                  ? "bg-wine text-white"
-                  : "border border-ink/20 text-ink/60 hover:border-wine/40 hover:text-wine"
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-
         {/* Price range pills */}
         <div className="flex flex-wrap items-center gap-1.5">
           {PRICE_FILTERS.map((pf, i) => (
@@ -116,6 +104,7 @@ export function ProductGrid({
         {filtered.length === products.length
           ? `${products.length} product${products.length === 1 ? "" : "s"}`
           : `${filtered.length} of ${products.length} product${products.length === 1 ? "" : "s"}`}
+        {query && ` matching "${query}"`}
       </p>
 
       {/* Grid */}
@@ -135,17 +124,15 @@ export function ProductGrid({
             <line x1="8" y1="11" x2="14" y2="11" />
           </svg>
           <p className="mt-2 text-sm text-ink/50">
-            No products match these filters.
+            {query
+              ? `No products match "${query}".`
+              : "No products match these filters."}
           </p>
-          <button
-            onClick={() => {
-              setCategoryFilter("All");
-              setPriceFilterIndex(0);
-            }}
-            className="btn-outline mt-3 text-xs"
-          >
-            Clear filters
-          </button>
+          {hasFilters && (
+            <button onClick={clearFilters} className="btn-outline mt-3 text-xs">
+              Clear filters
+            </button>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 lg:grid-cols-4">

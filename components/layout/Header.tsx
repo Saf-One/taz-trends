@@ -7,7 +7,7 @@ import { useCartProducts } from "@/lib/cart/useCartProducts";
 import { SignOutButton } from "@/components/auth/SignOutButton";
 import { formatPaise } from "@/lib/config";
 
-const CATEGORIES = ["Sarees", "Suits", "Lehengas", "Kurtis", "Accessories"];
+
 
 export function Header({
   userEmail,
@@ -81,7 +81,7 @@ export function Header({
   function handleSearchSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (searchQuery.trim()) {
-      window.location.href = `/products?q=${encodeURIComponent(searchQuery.trim())}`;
+      window.location.href = `/?search=${encodeURIComponent(searchQuery.trim())}`;
     }
   }
 
@@ -315,21 +315,8 @@ export function Header({
           </div>
         )}
 
-        {/* Category nav bar */}
-        <div className="hidden border-t border-ink/5 md:block">
-          <div className="container-page flex items-center justify-center gap-1 py-2">
-            {CATEGORIES.map((cat) => (
-              <Link
-                key={cat}
-                href={`/products?category=${cat.toLowerCase()}`}
-                className="rounded-full px-3 py-1 text-xs font-medium text-ink/60 transition-colors hover:bg-blush hover:text-wine"
-              >
-                {cat}
-              </Link>
-            ))}
-          </div>
-        </div>
       </header>
+
 
       {/* Mobile drawer overlay */}
       {mobileOpen && (
@@ -365,28 +352,6 @@ export function Header({
 
             {/* Drawer nav links */}
             <nav className="flex-1 overflow-y-auto px-4 py-4">
-              <p className="mb-2 text-[10px] font-medium uppercase tracking-wider text-ink/40">
-                Categories
-              </p>
-              <ul className="space-y-1">
-                {CATEGORIES.map((cat) => (
-                  <li key={cat}>
-                    <Link
-                      href={`/products?category=${cat.toLowerCase()}`}
-                      className="block rounded-md px-3 py-2 text-sm text-ink/80 hover:bg-blush hover:text-wine"
-                      onClick={() => setMobileOpen(false)}
-                    >
-                      {cat}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-
-              <hr className="my-4 border-ink/10" />
-
-              <p className="mb-2 text-[10px] font-medium uppercase tracking-wider text-ink/40">
-                Account
-              </p>
               <ul className="space-y-1">
                 {userEmail ? (
                   <>

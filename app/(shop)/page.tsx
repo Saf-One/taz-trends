@@ -6,7 +6,12 @@ import type { ProductWithRelations } from "@/types/db";
 // Product availability changes; don't statically cache the storefront.
 export const dynamic = "force-dynamic";
 
-export default async function HomePage() {
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ search?: string }>;
+}) {
+  const { search } = await searchParams;
   let products: ProductWithRelations[] = [];
   try {
     products = await getActiveProducts();
@@ -130,7 +135,7 @@ export default async function HomePage() {
           Handpicked ethnic wear, ready to ship.
         </p>
       </section>
-      <ProductGrid products={products} />
+      <ProductGrid products={products} searchQuery={search} />
 
       {/* Recently viewed */}
       <RecentlyViewed />
