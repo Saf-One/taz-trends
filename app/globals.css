@@ -34,6 +34,46 @@ body {
   @apply rounded-lg border border-ink/10 bg-white;
 }
 
+/* Rich-text description styling (product descriptions) */
+.md-body h1,
+.md-body h2,
+.md-body h3 {
+  @apply mb-2 mt-4 font-serif text-ink first:mt-0;
+}
+.md-body h1 {
+  @apply text-xl;
+}
+.md-body h2 {
+  @apply text-lg;
+}
+.md-body h3 {
+  @apply text-base;
+}
+.md-body p {
+  @apply mb-3 leading-relaxed last:mb-0;
+}
+.md-body ul {
+  @apply mb-3 list-disc space-y-1 pl-5;
+}
+.md-body ol {
+  @apply mb-3 list-decimal space-y-1 pl-5;
+}
+.md-body strong {
+  @apply font-semibold text-ink;
+}
+.md-body em {
+  @apply italic;
+}
+.md-body a {
+  @apply text-wine underline underline-offset-2;
+}
+.md-body blockquote {
+  @apply mb-3 border-l-2 border-gold pl-3 italic text-ink/60;
+}
+.md-body hr {
+  @apply my-4 border-ink/10;
+}
+
 .bg-flower-logo {
   background-size: 300px;
 }

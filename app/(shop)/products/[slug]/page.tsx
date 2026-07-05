@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import ReactMarkdown from "react-markdown";
 import { getProductBySlug } from "@/lib/catalog/queries";
 import { carouselImages } from "@/lib/catalog/images";
 import { AddToCartForm } from "@/components/product/AddToCartForm";
@@ -43,7 +44,9 @@ export default async function ProductPage({
       <div>
         <h1 className="font-serif text-3xl text-ink">{product.title}</h1>
         {product.description && (
-          <p className="mt-3 text-ink/70">{product.description}</p>
+          <div className="md-body mt-3 text-ink/70">
+            <ReactMarkdown>{product.description}</ReactMarkdown>
+          </div>
         )}
         <div className="mt-6">
           <AddToCartForm product={product} />
