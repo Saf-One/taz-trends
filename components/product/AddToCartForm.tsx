@@ -72,7 +72,6 @@ export function AddToCartForm({ product }: { product: ProductWithRelations }) {
                 type="button"
                 onClick={() => {
                   setVariantId(v.id);
-                  setAdded(false);
                 }}
                 disabled={v.stock <= 0}
                 className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
