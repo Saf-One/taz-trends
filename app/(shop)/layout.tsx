@@ -20,14 +20,13 @@ export default async function ShopLayout({
           />
         </div>
         <div
-          className="container-page flex-1 py-8"
+          className="container-page flex-1 py-8 bg-flower-logo"
           style={{
             backgroundImage:
               'linear-gradient(rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0.65)), url(/images/body/logo_flower.png)',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
             backgroundAttachment: 'fixed',
-            backgroundSize: 'auto',
             filter: 'drop-shadow(0 0 24px rgba(123, 45, 59, 0.15))',
           }}
         >
