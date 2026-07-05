@@ -35,7 +35,7 @@ export default async function ShopLayout({
         {/* Multi-column footer */}
         <footer className="border-t border-ink/10 bg-logo-bg">
           <div className="container-page py-8 sm:py-10">
-            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-4">
+            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3">
               {/* Column 1: Brand */}
               <div>
                 <div className="mb-3 w-24">
@@ -47,7 +47,7 @@ export default async function ShopLayout({
                 </p>
                 <div className="mt-4 flex gap-3">
                   {/* Instagram */}
-                  <a href="#" className="text-ink/30 hover:text-wine transition-colors" aria-label="Instagram">
+                  <a href="https://instagram.com/taz.trends" className="text-ink/30 hover:text-wine transition-colors" aria-label="Instagram">
                     <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor">
                       <path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 01-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 017.8 2m-.2 2A3.6 3.6 0 004 7.6v8.8C4 18.39 5.61 20 7.6 20h8.8a3.6 3.6 0 003.6-3.6V7.6C20 5.61 18.39 4 16.4 4H7.6m9.65 1.5a1.25 1.25 0 010 2.5 1.25 1.25 0 010-2.5M12 7a5 5 0 110 10 5 5 0 010-10m0 2a3 3 0 100 6 3 3 0 000-6z" />
                     </svg>
@@ -96,35 +96,6 @@ export default async function ShopLayout({
                   <li>
                     <a href="/quote" className="text-xs text-ink/50 hover:text-wine transition-colors">
                       Request Quote
-                    </a>
-                  </li>
-                </ul>
-              </div>
-
-              {/* Column 3: Customer Care */}
-              <div>
-                <h3 className="mb-3 font-serif text-sm font-medium text-ink">
-                  Customer Care
-                </h3>
-                <ul className="space-y-2">
-                  <li>
-                    <a href="#" className="text-xs text-ink/50 hover:text-wine transition-colors">
-                      Contact Us
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="text-xs text-ink/50 hover:text-wine transition-colors">
-                      Shipping Info
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="text-xs text-ink/50 hover:text-wine transition-colors">
-                      Returns
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="text-xs text-ink/50 hover:text-wine transition-colors">
-                      FAQ
                     </a>
                   </li>
                 </ul>

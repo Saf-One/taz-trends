@@ -58,7 +58,7 @@ export default async function HomePage({
       </section>
 
       {/* Brand value cards */}
-      <section className="mb-10 grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <section className="mb-10 grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div className="card flex items-start gap-3 p-4">
           <svg
             viewBox="0 0 24 24"
@@ -78,29 +78,6 @@ export default async function HomePage({
             </h3>
             <p className="mt-0.5 text-xs text-ink/50">
               On all orders across India. No minimum purchase required.
-            </p>
-          </div>
-        </div>
-        <div className="card flex items-start gap-3 p-4">
-          <svg
-            viewBox="0 0 24 24"
-            className="mt-0.5 h-6 w-6 shrink-0 text-wine"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M21 12a9 9 0 11-6.219-8.56" />
-            <path d="M21 3v5h-5" />
-            <path d="M12 7v5l3 3" />
-          </svg>
-          <div>
-            <h3 className="font-serif text-sm font-medium text-ink">
-              Easy Returns
-            </h3>
-            <p className="mt-0.5 text-xs text-ink/50">
-              7-day hassle-free returns. We&apos;ll pick it up from your door.
             </p>
           </div>
         </div>

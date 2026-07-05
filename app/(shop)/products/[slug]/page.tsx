@@ -204,12 +204,6 @@ export default async function ProductPage({
               {formatPaise(displayPricePaise(product))}
             </p>
           </div>
-          <a
-            href="#add-to-cart"
-            className={`btn-primary text-sm ${soldOut ? "pointer-events-none opacity-50" : ""}`}
-          >
-            {soldOut ? "Sold out" : "Add to cart"}
-          </a>
         </div>
       </div>
     </>
