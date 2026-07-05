@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getAllOrders } from "@/lib/checkout/admin-queries";
 import { StatusChip } from "@/components/admin/StatusChip";
+import { parseOrderAddress } from "@/lib/checkout/address";
 import { formatPaise } from "@/lib/config";
 
 export const dynamic = "force-dynamic";
@@ -30,7 +31,7 @@ export default async function AdminOrders() {
                   <StatusChip status={o.status} />
                 </p>
                 <p className="mt-0.5 truncate text-xs text-ink/50">
-                  {placed} · {o.address_json?.name ?? "—"} ·{" "}
+                  {placed} · {parseOrderAddress(o.address_json)?.name ?? "—"} ·{" "}
                   {o.payment_method === "cod" ? "COD" : "Razorpay"} · payment{" "}
                   {o.payment_status}
                 </p>

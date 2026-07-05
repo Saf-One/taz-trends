@@ -25,7 +25,9 @@ export async function POST(request: NextRequest) {
     p_shipping_paise: SHIPPING_FLAT_PAISE,
     p_offer_id: null,
     p_razorpay_order_id: null,
-    p_address_json: JSON.stringify(address),
+    // Pass the object as-is: stringifying would store a JSON *string*
+    // scalar in the jsonb column instead of an object.
+    p_address_json: address,
   });
 
   if (error) {

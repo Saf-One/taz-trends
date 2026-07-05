@@ -64,7 +64,8 @@ export async function POST(request: NextRequest) {
       p_shipping_paise: SHIPPING_FLAT_PAISE,
       p_offer_id: offer?.id ?? null,
       p_razorpay_order_id: rzpOrder.id,
-      p_address_json: JSON.stringify(address),
+      // Object as-is: stringifying stores a JSON string scalar, not an object.
+      p_address_json: address,
     },
   );
   if (orderErr) {

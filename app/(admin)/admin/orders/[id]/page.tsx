@@ -4,6 +4,7 @@ import { getOrderDetailAdmin } from "@/lib/checkout/admin-queries";
 import { updateOrderStatus } from "@/lib/checkout/actions";
 import { allowedNextStatuses } from "@/lib/checkout/status";
 import { StatusChip } from "@/components/admin/StatusChip";
+import { parseOrderAddress } from "@/lib/checkout/address";
 import { formatPaise } from "@/lib/config";
 
 export const dynamic = "force-dynamic";
@@ -18,7 +19,7 @@ export default async function AdminOrderDetail({
   if (!order) notFound();
 
   const nexts = allowedNextStatuses(order.status, order.payment_method);
-  const addr = order.address_json;
+  const addr = parseOrderAddress(order.address_json);
   const placed = new Date(order.created_at).toLocaleString("en-IN", {
     dateStyle: "medium",
     timeStyle: "short",
