@@ -129,7 +129,7 @@ export function Header({
           {/* Desktop nav links */}
           <nav className="hidden items-center gap-4 md:flex">
             <Link href="/quote" className="text-sm text-ink/70 hover:text-wine">
-              Request a quote
+              Bulk Order
             </Link>
             {isAdmin && (
               <Link href="/admin" className="text-sm text-ink/70 hover:text-wine">
@@ -413,7 +413,7 @@ export function Header({
                     <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
                     </svg>
-                    Request a quote
+                    Bulk Order
                   </Link>
                 </li>
                 {isAdmin && (
