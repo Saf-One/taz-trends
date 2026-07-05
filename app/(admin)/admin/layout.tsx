@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/auth/session";
 import { SignOutButton } from "@/components/auth/SignOutButton";
-import { STORE_NAME } from "@/lib/config";
+import { BrandLogo } from "@/components/layout/BrandLogo";
 
 const NAV = [
   { href: "/admin", label: "Overview" },
@@ -22,9 +22,9 @@ export default async function AdminLayout({
   return (
     <div className="flex min-h-screen">
       <aside className="w-56 shrink-0 border-r border-ink/10 bg-white p-4">
-        <Link href="/admin" className="font-serif text-lg text-wine">
-          {STORE_NAME}
-        </Link>
+        <div className="mb-2 w-32">
+          <BrandLogo href="/admin" />
+        </div>
         <p className="mb-4 text-xs text-ink/40">Admin</p>
         <nav className="flex flex-col gap-1 text-sm">
           {NAV.map((n) => (

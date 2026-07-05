@@ -15,8 +15,8 @@ export function Header({
 
   return (
     <header className="border-b border-ink/10">
-      <div className="container-page flex h-16 items-center justify-between">
-        <Link href="/" className="block h-full w-24 sm:w-32">
+      <div className="container-page flex h-20 items-center justify-between">
+        <Link href="/" className="block h-full w-32 sm:w-40">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/images/navbar/logo_navbar.png"

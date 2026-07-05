@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
-import { STORE_NAME } from "@/lib/config";
+import { BrandLogo } from "@/components/layout/BrandLogo";
 
 export const metadata = { title: "Sign in" };
 
@@ -14,7 +14,9 @@ export default function SignInPage({
   return (
     <main className="container-page flex min-h-screen flex-col items-center justify-center">
       <div className="card w-full max-w-sm p-8">
-        <h1 className="mb-1 font-serif text-2xl text-wine">{STORE_NAME}</h1>
+        <div className="mb-4 w-40">
+          <BrandLogo />
+        </div>
         <p className="mb-6 text-sm text-ink/70">
           Sign in to place orders and track them. Google only.
         </p>
