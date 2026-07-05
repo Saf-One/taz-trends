@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getProductBySlug } from "@/lib/catalog/queries";
-import { publicImageUrl } from "@/lib/catalog/images";
+import { carouselImages } from "@/lib/catalog/images";
 import { AddToCartForm } from "@/components/product/AddToCartForm";
+import { ImageCarousel } from "@/components/product/ImageCarousel";
 
 export const dynamic = "force-dynamic";
 
@@ -23,28 +24,20 @@ export default async function ProductPage({
   const product = await getProductBySlug(params.slug).catch(() => null);
   if (!product) notFound();
 
-  const primary =
-    product.product_images.find((i) => i.is_primary) ??
-    product.product_images[0];
-  const img = publicImageUrl(primary?.storage_path);
+  const images = carouselImages(product.product_images, product.title);
 
   return (
     <div className="grid gap-8 md:grid-cols-2">
-      <div className="card overflow-hidden">
-        <div className="relative aspect-[3/4] w-full bg-blush">
-          {img ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={img}
-              alt={primary?.alt ?? product.title}
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center font-serif text-ink/30">
-              {product.title}
-            </div>
-          )}
-        </div>
+      <div>
+        {images.length > 0 ? (
+          <div className="card overflow-hidden p-2">
+            <ImageCarousel images={images} showThumbnails />
+          </div>
+        ) : (
+          <div className="card flex aspect-[3/4] w-full items-center justify-center bg-blush font-serif text-ink/30">
+            {product.title}
+          </div>
+        )}
       </div>
 
       <div>
