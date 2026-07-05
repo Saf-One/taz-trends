@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
       .maybeSingle();
 
     if (updatedOrder) {
-      void sendOrderEmails(
+      await sendOrderEmails(
         updatedOrder as Order,
         user.email ?? "",
         user.user_metadata?.full_name ?? null,
