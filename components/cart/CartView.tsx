@@ -49,7 +49,7 @@ export function CartView() {
     if (!p) return "…";
     if (line.variant_id) {
       const v = p.product_variants.find((x) => x.id === line.variant_id);
-      return `${p.title}${v ? ` — ${v.variant_value}` : ""}`;
+      return `${p.title}${v ? ` - ${v.variant_value}` : ""}`;
     }
     return p.title;
   }

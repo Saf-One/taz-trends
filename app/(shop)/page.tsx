@@ -10,7 +10,7 @@ export default async function HomePage() {
   try {
     products = await getActiveProducts();
   } catch {
-    // Supabase not configured yet — render an empty storefront gracefully.
+    // Supabase not configured yet - render an empty storefront gracefully.
     products = [];
   }
 

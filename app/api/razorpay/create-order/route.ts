@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
   const offerCode: string | undefined = body?.offerCode;
   const address = body?.address || {};
 
-  // Server-computed subtotal — never trust a client amount.
+  // Server-computed subtotal - never trust a client amount.
   const { data: subtotal, error: subErr } = await supabase.rpc(
     "cart_subtotal_paise",
   );

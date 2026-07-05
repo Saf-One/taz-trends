@@ -1,5 +1,5 @@
 -- =====================================================================
--- 0003_storage.sql — product-images bucket: public read, admin write.
+-- 0003_storage.sql - product-images bucket: public read, admin write.
 -- =====================================================================
 
 insert into storage.buckets (id, name, public)

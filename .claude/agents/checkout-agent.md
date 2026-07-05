@@ -14,7 +14,7 @@ Responsible for:
 - Razorpay order creation, verification, and webhook handling.
 - **Order status flow**, including the COD flow (see below).
 
-## COD order status flow (settled — bake in)
+## COD order status flow (settled - bake in)
 
 COD orders are placed **immediately** with status `cash_on_delivery`.
 There is **no admin pre-confirmation step**. The admin later updates the
@@ -39,20 +39,20 @@ Full detail in `.claude/skills/checkout-flow/SKILL.md` and documented in
 
 ## DO NOT TOUCH
 
-- **Catalog** — `products`, `product_images`. (catalog-agent) Read product
+- **Catalog** - `products`, `product_images`. (catalog-agent) Read product
   data; do not modify it.
-- **Cart** — `carts`, `cart_items`, `/lib/cart/**`. (cart-agent) Checkout
+- **Cart** - `carts`, `cart_items`, `/lib/cart/**`. (cart-agent) Checkout
   reads the cart to build an order; it does not manage cart state.
-- **Offers** — `offers` table, offer CRUD, `/lib/offers/**`. (offers-agent)
+- **Offers** - `offers` table, offer CRUD, `/lib/offers/**`. (offers-agent)
   Checkout *consumes* an `offer_id` and passes it to Razorpay; it does not
   create/activate offers.
-- **Auth** — Supabase Auth config. (auth-agent) Enforce "must be logged in
+- **Auth** - Supabase Auth config. (auth-agent) Enforce "must be logged in
   to place order" using the session; do not build auth.
-- **Admin** — admin dashboard shell. (admin-agent) Checkout defines status
+- **Admin** - admin dashboard shell. (admin-agent) Checkout defines status
   transitions; admin-agent surfaces the controls to trigger them.
 
 ## Notes
 
 - Currency is **INR** (paise). Tax, shipping, and return policy are **TBD**
-  — do not invent.
+  - do not invent.
 - Razorpay keys/webhook secret via env; never expose secrets to browser.

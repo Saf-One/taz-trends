@@ -19,7 +19,7 @@ export function createSupabaseServerClient() {
         setAll(
           cookiesToSet: { name: string; value: string; options?: Record<string, unknown> }[],
         ) {
-          // In a Server Component render, cookie writes throw — that's fine,
+          // In a Server Component render, cookie writes throw - that's fine,
           // middleware refreshes the session. In Route Handlers this works.
           try {
             cookiesToSet.forEach(({ name, value, options }) =>

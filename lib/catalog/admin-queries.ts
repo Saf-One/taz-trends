@@ -1,7 +1,7 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { ProductWithRelations } from "@/types/db";
 
-/** All products regardless of status (admin only — RLS enforces is_admin). */
+/** All products regardless of status (admin only - RLS enforces is_admin). */
 export async function getAllProductsAdmin(): Promise<ProductWithRelations[]> {
   const supabase = createSupabaseServerClient();
   const { data } = await supabase

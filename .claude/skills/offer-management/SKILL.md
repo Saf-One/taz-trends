@@ -15,9 +15,9 @@ Razorpay `offer_id`.
    - `name` / `code` (internal label; code semantics **TBD**).
    - `razorpay_offer_id` (the mapping to Razorpay).
    - `is_active` (boolean; starts inactive unless specified).
-   - Validity window fields (`starts_at` / `ends_at`) — **TBD** whether
+   - Validity window fields (`starts_at` / `ends_at`) - **TBD** whether
      required; store if provided, do not invent defaults.
-   - Discount amount/percentage — **do not invent**; the actual discount is
+   - Discount amount/percentage - **do not invent**; the actual discount is
      enforced by Razorpay via the `offer_id`. Store only descriptive
      metadata the admin enters.
 

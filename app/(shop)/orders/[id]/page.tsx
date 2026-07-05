@@ -16,7 +16,7 @@ const STATUS_LABEL: Record<string, string> = {
   delivered: "Delivered",
   cancelled: "Cancelled",
   returned: "Returned",
-  cash_on_delivery: "Cash on Delivery — confirmed",
+  cash_on_delivery: "Cash on Delivery - confirmed",
 };
 
 export default async function OrderPage({

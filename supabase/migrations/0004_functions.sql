@@ -1,5 +1,5 @@
 -- =====================================================================
--- 0004_functions.sql — transactional RPCs.
+-- 0004_functions.sql - transactional RPCs.
 -- SECURITY DEFINER so a normal user can decrement stock / manage their
 -- own cart+order atomically; each fn enforces auth.uid() explicitly.
 -- =====================================================================

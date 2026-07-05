@@ -1,6 +1,6 @@
 /**
  * Single source of truth for store-wide config. Brand name, currency,
- * shipping are placeholders/defaults per docs/HANDOFF.md assumptions log —
+ * shipping are placeholders/defaults per docs/HANDOFF.md assumptions log -
  * change here (or via env) rather than hunting through the codebase.
  */
 
@@ -10,7 +10,7 @@ export const STORE_NAME =
 // Currency is INR only (settled). Money is integer paise everywhere.
 export const CURRENCY = "INR" as const;
 
-// Flat shipping in paise. Default ₹0 (free) — assumption, see HANDOFF.
+// Flat shipping in paise. Default ₹0 (free) - assumption, see HANDOFF.
 export const SHIPPING_FLAT_PAISE = Number(
   process.env.SHIPPING_FLAT_PAISE ?? 0,
 );

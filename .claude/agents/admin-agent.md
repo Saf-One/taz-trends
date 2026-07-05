@@ -11,7 +11,7 @@ Responsible for:
 - Product CRUD screens (using catalog-agent's product building blocks).
 - Image/price management surfaces (catalog-agent building blocks).
 - Offer management surfaces (offers-agent building blocks).
-- Order & quote visibility, and **order status management** controls —
+- Order & quote visibility, and **order status management** controls -
   including manually moving COD orders
   `cash_on_delivery -> delivered / returned`
   (transition logic defined by checkout-agent; admin surfaces the control).
@@ -25,15 +25,15 @@ Responsible for:
 
 ## DO NOT TOUCH
 
-- **Catalog internals** — `products`/`product_images` schema and
+- **Catalog internals** - `products`/`product_images` schema and
   `/lib/catalog/**` logic. (catalog-agent) Compose its components only.
-- **Cart** — `carts`, `cart_items`, `/lib/cart/**`. (cart-agent)
-- **Checkout/Orders internals** — `orders`/`order_items` schema, payment
+- **Cart** - `carts`, `cart_items`, `/lib/cart/**`. (cart-agent)
+- **Checkout/Orders internals** - `orders`/`order_items` schema, payment
   logic, and status-transition definitions in `/lib/checkout/**`.
   (checkout-agent) Admin triggers transitions; it does not redefine them.
-- **Offers internals** — `offers` schema and `/lib/offers/**` logic.
+- **Offers internals** - `offers` schema and `/lib/offers/**` logic.
   (offers-agent) Compose its components only.
-- **Auth** — Supabase Auth config, `/lib/supabase/**`. (auth-agent) Consume
+- **Auth** - Supabase Auth config, `/lib/supabase/**`. (auth-agent) Consume
   the admin role check; do not build auth.
 
 ## Notes

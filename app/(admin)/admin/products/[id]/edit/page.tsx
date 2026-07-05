@@ -48,11 +48,11 @@ export default async function EditProduct({
         </label>
         <div className="grid grid-cols-2 gap-4">
           <label className="block">
-            <span className="mb-1 block text-sm text-ink/70">Price (₹) — used when no variants</span>
+            <span className="mb-1 block text-sm text-ink/70">Price (₹) - used when no variants</span>
             <input name="price" type="number" defaultValue={rupees} className="input" />
           </label>
           <label className="block">
-            <span className="mb-1 block text-sm text-ink/70">Stock — used when no variants</span>
+            <span className="mb-1 block text-sm text-ink/70">Stock - used when no variants</span>
             <input name="stock" type="number" defaultValue={product.stock} className="input" />
           </label>
         </div>

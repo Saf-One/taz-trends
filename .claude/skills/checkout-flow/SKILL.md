@@ -23,7 +23,7 @@ Owner: **checkout-agent**. Covers quote, the two payment branches
 
 ---
 
-## Branch A — Razorpay (online payment)
+## Branch A - Razorpay (online payment)
 
 1. Optionally attach an **`offer_id`** (from offers-agent's active offers).
    The `offer_id` is **optional**; proceed with none if not provided.
@@ -41,7 +41,7 @@ Owner: **checkout-agent**. Covers quote, the two payment branches
 
 ---
 
-## Branch B — Cash on Delivery (COD) — separate path
+## Branch B - Cash on Delivery (COD) - separate path
 
 **Settled behavior (bake in):** COD orders are placed **immediately**.
 There is **NO admin pre-confirmation step**.
@@ -64,7 +64,7 @@ There is **NO admin pre-confirmation step**.
 
 ---
 
-## Order status model (summary — see docs/SCHEMA.md)
+## Order status model (summary - see docs/SCHEMA.md)
 
 - Razorpay path: `pending` payment -> `paid` -> fulfillment (values TBD).
 - COD path: `cash_on_delivery` -> `delivered` | `returned`.

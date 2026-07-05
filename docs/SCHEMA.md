@@ -1,4 +1,4 @@
-# SCHEMA (draft) — [Store Name — TBD]
+# SCHEMA (draft) - [Store Name - TBD]
 
 Draft table list. Columns are inferred from the brief; **TBD** marks
 anything not specified. Money = integer **paise** (INR smallest unit).
@@ -36,7 +36,7 @@ User profile linked to Supabase `auth.users`. Auth is **Google only**.
 | updated_at   | timestamptz |                                           |
 
 **Variants optional (settled).** A product has **zero variants** (simple
-product — `price` and `stock` live on this row) OR **one+ variants** (then
+product - `price` and `stock` live on this row) OR **one+ variants** (then
 price/stock live on the `product_variants` row; the product row `price` may
 act as a display/base fallback). See `product_variants`.
 
@@ -131,7 +131,7 @@ Covers both payment paths. **COD is placed immediately** at status
 | user_id           | uuid FK     | -> profiles.id (login required to order)     |
 | payment_method    | text/enum   | `razorpay` \| `cod`                          |
 | payment_status    | text/enum   | see below                                    |
-| status            | text/enum   | order status — see below                     |
+| status            | text/enum   | order status - see below                     |
 | offer_id          | uuid FK     | -> offers.id, nullable (Razorpay path only)  |
 | razorpay_order_id | text        | nullable (Razorpay path)                     |
 | total             | integer     | paise (INR)                                  |
@@ -148,7 +148,7 @@ shipping_paise`. Prices are tax-inclusive (no separate tax column).
 - Razorpay: `pending` -> `paid` (or `failed`).
 - COD: `unpaid` (until real-world settlement).
 
-### status — order status flow (unified enum)
+### status - order status flow (unified enum)
 
 `pending | processing | shipped | delivered | cancelled | returned |
 cash_on_delivery`

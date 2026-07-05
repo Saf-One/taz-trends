@@ -4,7 +4,7 @@ import { SHIPPING_FLAT_PAISE } from "@/lib/config";
 
 /**
  * Place a Cash-on-Delivery order. COD is placed IMMEDIATELY at status
- * cash_on_delivery (no admin pre-confirmation) — settled decision. The RPC
+ * cash_on_delivery (no admin pre-confirmation) - settled decision. The RPC
  * builds the order from the server cart, decrements stock, and clears it.
  * Address is stored in order metadata (JSON field).
  */

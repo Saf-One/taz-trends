@@ -25,19 +25,19 @@ Responsible for:
 
 ## DO NOT TOUCH
 
-- **Catalog** — `products`, `product_images`. (catalog-agent)
-- **Cart** — `carts`, `cart_items`, `/lib/cart/**`. (cart-agent) Auth
+- **Catalog** - `products`, `product_images`. (catalog-agent)
+- **Cart** - `carts`, `cart_items`, `/lib/cart/**`. (cart-agent) Auth
   *emits* the login event that triggers the cart merge, but the merge logic
   itself belongs to cart-agent.
-- **Checkout/Orders** — `orders`, `order_items`. (checkout-agent) Auth
+- **Checkout/Orders** - `orders`, `order_items`. (checkout-agent) Auth
   provides the session used to enforce login-to-order; it does not own
   order logic.
-- **Offers** — `offers`. (offers-agent)
-- **Admin** — `/app/(admin)/**` shell. (admin-agent) Auth provides the
+- **Offers** - `offers`. (offers-agent)
+- **Admin** - `/app/(admin)/**` shell. (admin-agent) Auth provides the
   admin identity/role check primitive; admin-agent consumes it.
 
 ## Notes
 
 - Admin role/authorization mechanism (how a user is marked admin) is
-  **TBD** — flag it; do not invent a hardcoded email or role scheme.
+  **TBD** - flag it; do not invent a hardcoded email or role scheme.
 - Never expose the service-role key to the browser.

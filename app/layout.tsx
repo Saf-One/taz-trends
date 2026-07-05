@@ -4,7 +4,7 @@ import { STORE_NAME } from "@/lib/config";
 
 export const metadata: Metadata = {
   title: {
-    default: `${STORE_NAME} — Women's Ethnic Fashion`,
+    default: `${STORE_NAME} - Women's Ethnic Fashion`,
     template: `%s · ${STORE_NAME}`,
   },
   description: "Women's ethnic fashion and outfits.",

@@ -23,19 +23,19 @@ See `.claude/skills/offer-management/SKILL.md`.
 
 ## DO NOT TOUCH
 
-- **Catalog** — `products`, `product_images`. (catalog-agent) Base price
+- **Catalog** - `products`, `product_images`. (catalog-agent) Base price
   lives on products; offers do not edit product rows.
-- **Cart** — `carts`, `cart_items`. (cart-agent)
-- **Checkout/Orders** — `orders`, `order_items`, Razorpay order creation,
+- **Cart** - `carts`, `cart_items`. (cart-agent)
+- **Checkout/Orders** - `orders`, `order_items`, Razorpay order creation,
   `/lib/checkout/**`. (checkout-agent) Offers agent provides the active
   `offer_id`; checkout-agent applies it to the Razorpay order.
-- **Auth** — Supabase Auth config. (auth-agent)
-- **Admin shell/routing** — the admin framework itself. (admin-agent)
+- **Auth** - Supabase Auth config. (auth-agent)
+- **Admin shell/routing** - the admin framework itself. (admin-agent)
   Offers agent owns offer screens' logic; admin-agent owns the shell.
 
 ## Notes
 
-- Discount percentages / amounts and validity windows are **TBD** — do not
+- Discount percentages / amounts and validity windows are **TBD** - do not
   invent values or rules. Store what the admin enters; validate structure,
   not policy.
 - COD path: whether offers apply to COD is **TBD** (Razorpay `offer_id` is

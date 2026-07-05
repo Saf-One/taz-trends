@@ -1,5 +1,5 @@
 -- =====================================================================
--- seed.sql — sample catalog so the storefront renders without an admin
+-- seed.sql - sample catalog so the storefront renders without an admin
 -- upload. Prices are paise (INR). Run after migrations.
 -- =====================================================================
 
@@ -36,6 +36,6 @@ values (
   '33333333-3333-3333-3333-333333333333',
   'festive-lehenga-preview',
   'Festive Lehenga (coming soon)',
-  'Draft — should not be visible on the storefront.',
+  'Draft - should not be visible on the storefront.',
   899900, 4, 'draft'
 ) on conflict (id) do nothing;

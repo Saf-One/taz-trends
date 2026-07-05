@@ -15,7 +15,7 @@ drop either side.**
 - **Account cart**: rows in `cart_items` for the user's `carts` row.
 - **Line-item identity key**: `product_id` + `variant_id`.
   `variant_id` is **nullable**: null = simple product (no variant). Treat
-  null as its **own valid key** — never collapse a null-variant line into
+  null as its **own valid key** - never collapse a null-variant line into
   any real variant line, and never merge two different `variant_id`s.
   Normalize only null/undefined to a single canonical null token so a
   missing and an explicit-null variant map to the SAME key.
@@ -38,7 +38,7 @@ runs twice, the second run must not double quantities.
 2. **Normalize keys** for every line item on both sides:
    `key = product_id + "|" + normalize(variant_id)`, where `normalize`
    maps null/undefined to a single canonical null token. Null variant_id
-   is a distinct, valid key — not merged with any real variant.
+   is a distinct, valid key - not merged with any real variant.
 
 3. **Build a map** keyed by the identity key, starting from the **account
    cart** (authoritative persistence side).
@@ -48,7 +48,7 @@ runs twice, the second run must not double quantities.
    - **Conflict** (key already present): **sum the quantities**
      (`account.qty + guest.qty`). Do not take max, do not overwrite, do
      not skip. Apply any max-quantity/stock cap **only if such a rule is
-     specified** — none is today (**TBD**); until then, sum without a cap.
+     specified** - none is today (**TBD**); until then, sum without a cap.
 
 5. **Validate product references.** For each merged item, confirm the
    `product_id` still exists and is purchasable (read-only check against
@@ -57,7 +57,7 @@ runs twice, the second run must not double quantities.
      UI can inform the user. **Do not silently delete it.**
 
 6. **Persist** the merged set to `cart_items` (upsert by identity key) in a
-   **single transaction**. On any failure, roll back — leave the account
+   **single transaction**. On any failure, roll back - leave the account
    cart untouched and **retain the guest cart in localStorage** so nothing
    is lost. Only clear `localStorage` after a confirmed successful commit.
 

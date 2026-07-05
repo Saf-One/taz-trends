@@ -1,5 +1,5 @@
 -- =====================================================================
--- 0005_add_address.sql — add address_json column to orders
+-- 0005_add_address.sql - add address_json column to orders
 -- =====================================================================
 
 alter table orders add column address_json jsonb;

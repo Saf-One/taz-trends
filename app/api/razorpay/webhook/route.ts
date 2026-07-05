@@ -5,7 +5,7 @@ import { verifyWebhookSignature } from "@/lib/checkout/razorpay";
 /**
  * Razorpay webhook (server-to-server source of truth). Idempotently marks
  * the matching local order paid on payment.captured / order.paid. Verified
- * against the raw body — do not parse before checking the signature.
+ * against the raw body - do not parse before checking the signature.
  */
 export async function POST(request: NextRequest) {
   const raw = await request.text();

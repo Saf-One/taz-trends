@@ -2,7 +2,7 @@ import type { GuestCartLine } from "@/types/db";
 
 /**
  * Guest cart persistence in localStorage. Identity of a line is
- * (product_id, variant_id) with variant_id null for simple products — kept
+ * (product_id, variant_id) with variant_id null for simple products - kept
  * as its own key, never collapsed. See cart-merge-on-login skill.
  */
 const KEY = "guest_cart_v1";

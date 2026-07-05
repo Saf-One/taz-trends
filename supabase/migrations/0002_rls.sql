@@ -1,5 +1,5 @@
 -- =====================================================================
--- 0002_rls.sql — Row Level Security. Prefer RLS over app-layer authz.
+-- 0002_rls.sql - Row Level Security. Prefer RLS over app-layer authz.
 -- Admin = profiles.is_admin (checked via public.is_admin()).
 -- =====================================================================
 

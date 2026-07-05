@@ -5,7 +5,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 /**
  * Create an offer mapping to a Razorpay offer_id. We validate structure,
- * not discount policy — the actual discount lives in Razorpay.
+ * not discount policy - the actual discount lives in Razorpay.
  */
 export async function createOffer(formData: FormData) {
   const supabase = createSupabaseServerClient();
@@ -24,7 +24,7 @@ export async function createOffer(formData: FormData) {
   revalidatePath("/admin/offers");
 }
 
-/** Soft toggle — never deletes; preserves history on past orders. */
+/** Soft toggle - never deletes; preserves history on past orders. */
 export async function toggleOffer(offerId: string, isActive: boolean) {
   const supabase = createSupabaseServerClient();
   const { error } = await supabase

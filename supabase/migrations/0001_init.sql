@@ -1,5 +1,5 @@
 -- =====================================================================
--- 0001_init.sql — full schema per docs/SCHEMA.md
+-- 0001_init.sql - full schema per docs/SCHEMA.md
 -- Money is integer paise (INR). Variants optional. NULL-safe uniqueness.
 -- =====================================================================
 
@@ -34,7 +34,7 @@ create table profiles (
   created_at  timestamptz not null default now()
 );
 
--- SECURITY DEFINER admin check — avoids recursive RLS on profiles.
+-- SECURITY DEFINER admin check - avoids recursive RLS on profiles.
 create or replace function public.is_admin()
 returns boolean language sql stable security definer set search_path = public as $$
   select coalesce((select is_admin from profiles where id = auth.uid()), false);

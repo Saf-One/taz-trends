@@ -115,7 +115,7 @@ export interface Quote {
   created_at: string;
 }
 
-/** A product with its images and variants joined — storefront view model. */
+/** A product with its images and variants joined - storefront view model. */
 export interface ProductWithRelations extends Product {
   product_images: ProductImage[];
   product_variants: ProductVariant[];

@@ -2,7 +2,7 @@ import "server-only";
 import { createClient } from "@supabase/supabase-js";
 
 /**
- * Service-role client — BYPASSES RLS. Server-only. Use only for trusted
+ * Service-role client - BYPASSES RLS. Server-only. Use only for trusted
  * server flows: profile admin-grant on login, payment verification /
  * webhooks. NEVER import this into client code.
  */

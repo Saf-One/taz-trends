@@ -4,7 +4,7 @@ import { BrandLogo } from "@/components/layout/BrandLogo";
 
 export const metadata = { title: "Sign in" };
 
-// Saree-border scallop: a row of gold semicircles hanging from the edge —
+// Saree-border scallop: a row of gold semicircles hanging from the edge -
 // the "jhalar" trim seen on ethnic-wear borders. This is the page signature.
 const sareeBorder: React.CSSProperties = {
   height: "16px",
@@ -23,9 +23,9 @@ export default function SignInPage({
 
   return (
     <main className="grid min-h-screen lg:grid-cols-[1.05fr_1fr]">
-      {/* Editorial panel — the atelier side */}
+      {/* Editorial panel - the atelier side */}
       <aside className="relative hidden overflow-hidden bg-wine text-logo-bg lg:flex lg:flex-col lg:justify-between lg:p-14">
-        {/* Mehrab arch — the niche silhouette of a boutique doorway */}
+        {/* Mehrab arch - the niche silhouette of a boutique doorway */}
         <div
           aria-hidden
           className="pointer-events-none absolute -right-24 top-1/2 -translate-y-1/2"
@@ -85,7 +85,7 @@ export default function SignInPage({
             Step into the atelier
           </h1>
           <p className="mt-3 text-sm leading-relaxed text-ink/60">
-            Sign in with Google to place orders and track them — no passwords to
+            Sign in with Google to place orders and track them - no passwords to
             remember.
           </p>
 

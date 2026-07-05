@@ -1,4 +1,4 @@
-# CLAUDE.md — [Store Name — TBD]
+# CLAUDE.md - [Store Name - TBD]
 
 A women's ethnic fashion and outfits e-commerce site.
 
@@ -7,7 +7,7 @@ schema/migrations → auth → catalog → cart → checkout (Razorpay + COD) �
 
 ## Autonomy
 - Don't ask for confirmation on implementation details covered by 
-  existing agent/skill docs — just build it.
+  existing agent/skill docs - just build it.
 - If something is genuinely undecided (see HANDOFF.md open questions), 
   make the most reasonable e-commerce-standard choice, implement it, 
   and log the assumption in HANDOFF.md instead of stopping to ask.
@@ -16,7 +16,7 @@ schema/migrations → auth → catalog → cart → checkout (Razorpay + COD) �
 - After finishing a domain, update HANDOFF.md, then move to the next 
   item in the build order without waiting for confirmation.
 
-## Stack (fixed — do not substitute or add to)
+## Stack (fixed - do not substitute or add to)
 
 - **Next.js** (App Router)
 - **Supabase** (Postgres, Auth, Storage)
@@ -28,19 +28,19 @@ infrastructure "for scale."
 
 ## Core domains
 
-1. **Catalog** — owner adds products, images, prices via admin.
-2. **Quotes/Orders** — customers can raise a quote or place a direct order.
-3. **Cart** — guest carts in localStorage; logged-in carts in Supabase.
+1. **Catalog** - owner adds products, images, prices via admin.
+2. **Quotes/Orders** - customers can raise a quote or place a direct order.
+3. **Cart** - guest carts in localStorage; logged-in carts in Supabase.
    Must **merge** guest cart into account cart on login (never overwrite,
    never silently drop either side). Must be logged in to place an order;
    the quote step can be pre-login.
-4. **Checkout/Payments** — Razorpay online payment AND Cash on Delivery
+4. **Checkout/Payments** - Razorpay online payment AND Cash on Delivery
    (COD) as a separate order path. Razorpay orders support an optional
    `offer_id`.
-5. **Offers** — admin creates, activates/deactivates, and manages offers
+5. **Offers** - admin creates, activates/deactivates, and manages offers
    mapped to a Razorpay `offer_id`.
-6. **Auth** — Supabase Auth, **Google sign-in only**. No phone/OTP.
-7. **Admin** — product CRUD, image/price management, offer management,
+6. **Auth** - Supabase Auth, **Google sign-in only**. No phone/OTP.
+7. **Admin** - product CRUD, image/price management, offer management,
    order/quote visibility, order status management.
 
 ## Folder conventions
@@ -70,11 +70,11 @@ infrastructure "for scale."
 - TypeScript everywhere. No `any` unless justified with a comment.
 - Server-side data access via server components / route handlers using the
   server Supabase client. Never expose service-role keys to the browser.
-- Money is stored as integer **paise** (INR only — settled). See
+- Money is stored as integer **paise** (INR only - settled). See
   docs/SCHEMA.md.
 - Prefer Supabase Row Level Security (RLS) over app-layer authorization.
 - Keep domain logic in `/lib/<domain>`, not inside components.
-- No business rules invented in code — anything not specified in the brief
+- No business rules invented in code - anything not specified in the brief
   is TBD and must be confirmed with the owner (see docs/PRD.md).
 
 ## Where things live
@@ -99,7 +99,7 @@ infrastructure "for scale."
 
 **Open questions** are tracked in `docs/HANDOFF.md` and `docs/PRD.md`.
 Highlights:
-- Brand name is **[Store Name — TBD]** — a real name is needed.
+- Brand name is **[Store Name - TBD]** - a real name is needed.
 - Return/cancellation policy, quote workflow specifics, tax/shipping
   handling, and product `status` enum values are all **TBD**.
 
