@@ -7,15 +7,13 @@ import { useCart } from "@/lib/cart/CartProvider";
 import { formatPaise } from "@/lib/config";
 
 export function AddToCartForm({ product }: { product: ProductWithRelations }) {
-  const { add } = useCart();
+  const { add, lines, setQty, remove } = useCart();
   const variants = product.product_variants ?? [];
   const hasVariants = variants.length > 0;
 
   const [variantId, setVariantId] = useState<string | null>(
     hasVariants ? (variants.find((v) => v.stock > 0)?.id ?? variants[0].id) : null,
   );
-  const [qty, setQty] = useState(1);
-  const [added, setAdded] = useState(false);
   const [busy, setBusy] = useState(false);
 
   const selectedVariant = hasVariants
@@ -29,11 +27,33 @@ export function AddToCartForm({ product }: { product: ProductWithRelations }) {
   const stock = selectedVariant ? selectedVariant.stock : product.stock;
   const soldOut = stock <= 0;
 
+  const cartLine = lines.find(
+    (l) => l.product_id === product.id && l.variant_id === (hasVariants ? variantId : null),
+  );
+  const cartQty = cartLine?.quantity ?? 0;
+
   async function onAdd() {
     setBusy(true);
-    await add(product.id, hasVariants ? variantId : null, qty);
+    await add(product.id, hasVariants ? variantId : null, 1);
     setBusy(false);
-    setAdded(true);
+  }
+
+  function onDecrement() {
+    if (!cartLine) return;
+    setBusy(true);
+    if (cartLine.quantity <= 1) {
+      remove(cartLine);
+    } else {
+      setQty(cartLine, cartLine.quantity - 1);
+    }
+    setBusy(false);
+  }
+
+  function onIncrement() {
+    if (!cartLine) return;
+    setBusy(true);
+    setQty(cartLine, cartLine.quantity + 1);
+    setBusy(false);
   }
 
   return (
@@ -68,37 +88,32 @@ export function AddToCartForm({ product }: { product: ProductWithRelations }) {
         </div>
       )}
 
-      <label className="block">
-        <span className="mb-1 block text-sm text-ink/70">Quantity</span>
-        <input
-          type="number"
-          min={1}
-          max={Math.max(1, stock)}
-          value={qty}
-          onChange={(e) => {
-            setQty(Math.max(1, Number(e.target.value) || 1));
-            setAdded(false);
-          }}
-          className="input w-24"
-          disabled={soldOut}
-        />
-      </label>
-
-      <button
-        className="btn-primary w-full"
-        onClick={onAdd}
-        disabled={soldOut || busy}
-      >
-        {soldOut ? "Sold out" : busy ? "Adding…" : "Add to cart"}
-      </button>
-
-      {added && (
-        <p className="text-sm text-ink/70">
-          Added.{" "}
-          <Link href="/cart" className="text-wine underline">
-            Go to cart
-          </Link>
-        </p>
+      {cartQty > 0 ? (
+        <div className="flex items-center gap-2">
+          <button
+            className="flex-1 rounded-md border border-wine/40 px-3 py-2 font-bold text-wine hover:bg-wine/5 disabled:border-ink/20 disabled:text-ink/30"
+            onClick={onDecrement}
+            disabled={busy}
+          >
+            −
+          </button>
+          <span className="flex-1 text-center font-medium">{cartQty}</span>
+          <button
+            className="flex-1 rounded-md border border-wine/40 px-3 py-2 font-bold text-wine hover:bg-wine/5"
+            onClick={onIncrement}
+            disabled={busy}
+          >
+            +
+          </button>
+        </div>
+      ) : (
+        <button
+          className="btn-primary w-full"
+          onClick={onAdd}
+          disabled={soldOut || busy}
+        >
+          {soldOut ? "Sold out" : busy ? "Adding…" : "Add to cart"}
+        </button>
       )}
     </div>
   );

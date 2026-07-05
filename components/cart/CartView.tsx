@@ -102,9 +102,14 @@ export function CartView() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <button
-                        className="text-lg font-bold text-ink/60 hover:text-ink disabled:opacity-50"
-                        onClick={() => setQty(line, line.quantity - 1)}
-                        disabled={line.quantity <= 1}
+                        className="text-lg font-bold text-ink/60 hover:text-ink"
+                        onClick={() => {
+                          if (line.quantity <= 1) {
+                            remove(line);
+                          } else {
+                            setQty(line, line.quantity - 1);
+                          }
+                        }}
                       >
                         −
                       </button>
