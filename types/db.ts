@@ -36,6 +36,7 @@ export interface Product {
   description: string | null;
   price: number; // paise; used when no variants
   stock: number; // used when no variants
+  compare_at_price: number | null; // paise; optional higher price for discount display
   status: ProductStatus;
   created_at: string;
   updated_at: string;

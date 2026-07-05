@@ -17,6 +17,7 @@ import {
   getGuestLines,
   setGuestQty,
 } from "@/lib/cart/guest";
+import { useToast } from "@/lib/notifications/ToastProvider";
 
 export interface CartLine {
   product_id: string;
@@ -44,6 +45,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(false);
   const mergedRef = useRef(false);
+  const { toast } = useToast();
 
   const authed = !!user;
 
@@ -138,8 +140,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         addGuestLine({ product_id, variant_id, quantity: qty });
         loadGuestLines();
       }
+      toast("Added to cart!", "success");
     },
-    [user, supabase, loadServerLines, loadGuestLines],
+    [user, supabase, loadServerLines, loadGuestLines, toast],
   );
 
   const setQty = useCallback(

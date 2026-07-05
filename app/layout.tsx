@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { STORE_NAME } from "@/lib/config";
+import { ToastProvider } from "@/lib/notifications/ToastProvider";
 
 export const metadata: Metadata = {
   title: {
@@ -48,7 +49,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="min-h-screen antialiased">{children}</body>
+      <body className="min-h-screen antialiased">
+        <ToastProvider>{children}</ToastProvider>
+      </body>
     </html>
   );
 }

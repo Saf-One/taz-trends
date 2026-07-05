@@ -93,6 +93,49 @@ and implemented. None is destructive.
    gate on `is_admin`.
 9. **Supabase Storage** - bucket **`product-images`**, **public read**,
    authenticated (admin) write. Configured in migrations + a note in setup.
+10. **Shop frontend polish** - Visual/functional improvements applied:
+    - Sticky header with category nav bar, expanding search, mini-cart
+      dropdown on hover, mobile slide-out drawer.
+    - Homepage hero banner (wine→blush gradient) + 3 brand value cards.
+    - Product cards: quick-add button on hover, buy-now link, share
+      button (Web Share API / clipboard), discount badge, hover zoom.
+    - Product grid: category pill filters + price range filters,
+      results count, empty filter state.
+    - Product detail: breadcrumbs, share button, "You may also like"
+      recommendations (same-category random), mobile sticky add-to-cart
+      bar, recently viewed strip (localStorage).
+    - Cart: coupon code input, free-shipping progress bar (₹999
+      threshold), empty cart illustration, styled qty controls.
+    - Checkout: step indicator (Address→Payment→Confirmation), saved
+      address (localStorage, pre-fill on return), offer code with Apply
+      feedback.
+    - Multi-column footer with social icons, quick links, customer care,
+      newsletter input, payment method icons.
+    - Toast notifications (success/error/info) on add-to-cart, order
+      placed, payment confirmed. Auto-dismiss 4s.
+    - Skeleton loading grid on shop pages.
+    - Page fade-in transitions via PageTransition wrapper.
+11. **Admin dashboard polish** - Visual/functional improvements applied:
+    - AdminNav with inline SVG icons for all 5 nav items.
+    - Dashboard overview: stat cards with color-coded icons + hover
+      effects, SVG bar chart (orders by status), donut chart (products
+      by status), quick-action cards.
+    - Sortable/searchable tables for Products, Orders, Offers, Quotes
+      (useSortable generic hook, search bar, status filter pills,
+      pagination).
+    - Drag-and-drop image uploader with visual feedback.
+    - Product form: improved labels, rupee prefix, hints, variant table
+      with delete icon, image preview with count badge and hover zoom.
+    - StatusChip extended for all status types.
+12. **Perf constraints honoured throughout** -
+    - No JS animation libraries (pure CSS transforms/opacity).
+    - `backdrop-blur` removed from header and mobile drawer (bg-white/95
+      is effectively opaque; blur forces an expensive compositor layer).
+    - Scroll listener is `passive: true`.
+    - Product filters use `useMemo`.
+    - All animations use GPU-composited properties (transform, opacity).
+    - No new npm packages added.
+    - `tsc --noEmit` passes clean.
 
 > Note: Phone/OTP auth remains intentionally **out of scope** (Google-only)
 > and was never an open question.

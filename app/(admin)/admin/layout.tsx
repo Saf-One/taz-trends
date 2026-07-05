@@ -3,6 +3,7 @@ import { requireAdmin } from "@/lib/auth/session";
 import { SignOutButton } from "@/components/auth/SignOutButton";
 import { BrandLogo } from "@/components/layout/BrandLogo";
 import { AdminNav } from "@/components/admin/AdminNav";
+import { PageTransition } from "@/components/ui/PageTransition";
 
 export default async function AdminLayout({
   children,
@@ -44,7 +45,9 @@ export default async function AdminLayout({
         </div>
       </aside>
 
-      <main className="flex-1 bg-blush/40 p-4 sm:p-6 md:p-8">{children}</main>
+      <main className="flex-1 bg-blush/40 p-4 sm:p-6 md:p-8">
+        <PageTransition>{children}</PageTransition>
+      </main>
     </div>
   );
 }
