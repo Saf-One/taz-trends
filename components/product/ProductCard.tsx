@@ -10,7 +10,7 @@ import {
   displayPricePaise,
   hasVariants,
   totalStock,
-} from "@/lib/catalog/queries";
+} from "@/lib/catalog/queries-utils";
 import { ImageCarousel } from "./ImageCarousel";
 import { useCart } from "@/lib/cart/CartProvider";
 

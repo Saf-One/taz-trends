@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import type { ProductWithRelations } from "@/types/db";
 import { formatPaise } from "@/lib/config";
-import { hasVariants, totalStock } from "@/lib/catalog/queries";
+import { hasVariants, totalStock } from "@/lib/catalog/queries-utils";
 import { StatusChip } from "./StatusChip";
 import { useSortable } from "./useSortable";
 import { SortIcon } from "./SortIcon";

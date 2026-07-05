@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { getActiveProducts } from "@/lib/catalog/queries";
+import { getActiveProductsBrowser } from "@/lib/catalog/queries-browser";
 import { formatPaise } from "@/lib/config";
 import type { ProductWithRelations } from "@/types/db";
-import { displayPricePaise } from "@/lib/catalog/queries";
+import { displayPricePaise } from "@/lib/catalog/queries-utils";
 import { carouselImages } from "@/lib/catalog/images";
 
 const STORAGE_KEY = "taz_recently_viewed";
@@ -32,7 +32,7 @@ export function RecentlyViewed() {
           return;
         }
 
-        const all = await getActiveProducts();
+        const all = await getActiveProductsBrowser();
         const slugIndex = new Map(all.map((p) => [p.slug, p]));
         const matched = slugs
           .map((s) => slugIndex.get(s))
