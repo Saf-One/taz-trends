@@ -29,6 +29,7 @@ export async function updateOrderStatus(orderId: string, next: OrderStatus) {
     .eq("id", orderId);
   if (error) throw new Error(error.message);
   revalidatePath("/admin/orders");
+  revalidatePath(`/admin/orders/${orderId}`);
 }
 
 export async function updateQuoteStatus(quoteId: string, next: QuoteStatus) {

@@ -68,6 +68,15 @@ export interface CartItem {
   quantity: number;
 }
 
+/** Delivery address captured at checkout (stored as orders.address_json). */
+export interface OrderAddress {
+  name?: string;
+  phone?: string;
+  street?: string;
+  city?: string;
+  postal?: string;
+}
+
 export interface Order {
   id: string;
   user_id: string;
@@ -79,6 +88,7 @@ export interface Order {
   subtotal_paise: number;
   shipping_paise: number;
   total: number; // paise
+  address_json: OrderAddress | null;
   created_at: string;
   updated_at: string;
 }

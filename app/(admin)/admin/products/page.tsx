@@ -17,22 +17,22 @@ export default async function AdminProducts() {
         </Link>
       </div>
 
-      <div className="card overflow-hidden">
-        <table className="w-full text-sm">
+      <div className="card overflow-x-auto">
+        <table className="w-full min-w-[560px] text-sm">
           <thead className="bg-blush text-left text-ink/60">
             <tr>
               <th className="p-3">Title</th>
               <th className="p-3">Status</th>
               <th className="p-3">Price</th>
               <th className="p-3">Stock</th>
-              <th className="p-3">Type</th>
+              <th className="hidden p-3 sm:table-cell">Type</th>
               <th className="p-3"></th>
             </tr>
           </thead>
           <tbody>
             {products.map((p) => (
               <tr key={p.id} className="border-t border-ink/10">
-                <td className="p-3">{p.title}</td>
+                <td className="p-3 font-medium">{p.title}</td>
                 <td className="p-3">
                   <span className="rounded bg-blush px-2 py-0.5 text-xs">
                     {p.status}
@@ -40,7 +40,7 @@ export default async function AdminProducts() {
                 </td>
                 <td className="p-3">{formatPaise(p.price)}</td>
                 <td className="p-3">{totalStock(p)}</td>
-                <td className="p-3 text-ink/60">
+                <td className="hidden p-3 text-ink/60 sm:table-cell">
                   {hasVariants(p) ? "Variants" : "Simple"}
                 </td>
                 <td className="p-3 text-right">
