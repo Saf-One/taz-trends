@@ -92,22 +92,30 @@ export function CartView() {
                   <div className="flex items-start justify-between">
                     <span className="font-serif text-sm">{label(line)}</span>
                     <button
-                      className="text-xs text-ink/50 hover:text-wine"
+                      className="text-lg text-ink/30 hover:text-red-600"
                       onClick={() => remove(line)}
+                      title="Remove"
                     >
-                      Remove
+                      ✕
                     </button>
                   </div>
                   <div className="flex items-center justify-between">
-                    <input
-                      type="number"
-                      min={1}
-                      value={line.quantity}
-                      onChange={(e) =>
-                        setQty(line, Math.max(1, Number(e.target.value) || 1))
-                      }
-                      className="input w-20"
-                    />
+                    <div className="flex items-center gap-2">
+                      <button
+                        className="text-lg font-bold text-ink/60 hover:text-ink disabled:opacity-50"
+                        onClick={() => setQty(line, line.quantity - 1)}
+                        disabled={line.quantity <= 1}
+                      >
+                        −
+                      </button>
+                      <span className="w-6 text-center text-sm font-medium">{line.quantity}</span>
+                      <button
+                        className="text-lg font-bold text-ink/60 hover:text-ink"
+                        onClick={() => setQty(line, line.quantity + 1)}
+                      >
+                        +
+                      </button>
+                    </div>
                     <span className="text-sm text-wine">
                       {formatPaise(unitPaise(line) * line.quantity)}
                     </span>
