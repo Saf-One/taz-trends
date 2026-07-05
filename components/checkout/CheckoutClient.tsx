@@ -34,8 +34,22 @@ export function CheckoutClient({ shippingPaise }: { shippingPaise: number }) {
   const { lines, count, refresh, ready } = useCart();
   const [products, setProducts] = useState<Record<string, ProductWithRelations>>({});
   const [offerCode, setOfferCode] = useState("");
+  const [address, setAddress] = useState({
+    name: "",
+    phone: "",
+    street: "",
+    city: "",
+    postal: "",
+  });
   const [busy, setBusy] = useState<null | "cod" | "razorpay">(null);
   const [error, setError] = useState<string | null>(null);
+
+  const addressFilled =
+    address.name.trim() &&
+    address.phone.trim() &&
+    address.street.trim() &&
+    address.city.trim() &&
+    address.postal.trim();
 
   const productIds = useMemo(
     () => Array.from(new Set(lines.map((l) => l.product_id))),
@@ -72,14 +86,17 @@ export function CheckoutClient({ shippingPaise }: { shippingPaise: number }) {
   async function placeCod() {
     setBusy("cod");
     setError(null);
-    const res = await fetch("/api/orders/cod", { method: "POST" });
+    const res = await fetch("/api/orders/cod", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ address }),
+    });
     const json = await res.json();
     setBusy(null);
     if (!res.ok) {
       setError(json.error ?? "Could not place order.");
       return;
     }
-    await refresh();
     router.push(`/orders/${json.orderId}`);
   }
 
@@ -90,7 +107,10 @@ export function CheckoutClient({ shippingPaise }: { shippingPaise: number }) {
     const res = await fetch("/api/razorpay/create-order", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ offerCode: offerCode || undefined }),
+      body: JSON.stringify({
+        offerCode: offerCode || undefined,
+        address,
+      }),
     });
     const json = await res.json();
     if (!res.ok) {
@@ -129,7 +149,8 @@ export function CheckoutClient({ shippingPaise }: { shippingPaise: number }) {
         });
         const vj = await vr.json();
         if (vr.ok) {
-          await refresh();
+          // Don't refresh (cart still needed for next page). Just navigate.
+          // Verify route will clear cart after confirming payment server-side.
           router.push(`/orders/${vj.orderId}`);
         } else {
           setError("Payment could not be verified. If charged, contact us.");
@@ -151,6 +172,44 @@ export function CheckoutClient({ shippingPaise }: { shippingPaise: number }) {
   return (
     <div className="grid gap-8 lg:grid-cols-3">
       <div className="lg:col-span-2 space-y-4">
+        {/* Address */}
+        <div className="card space-y-3 p-4">
+          <h2 className="font-serif text-lg">Delivery address</h2>
+          <input
+            className="input"
+            placeholder="Full name"
+            value={address.name}
+            onChange={(e) => setAddress({ ...address, name: e.target.value })}
+          />
+          <input
+            className="input"
+            placeholder="Phone"
+            value={address.phone}
+            onChange={(e) => setAddress({ ...address, phone: e.target.value })}
+          />
+          <input
+            className="input"
+            placeholder="Street address"
+            value={address.street}
+            onChange={(e) => setAddress({ ...address, street: e.target.value })}
+          />
+          <div className="grid grid-cols-2 gap-2">
+            <input
+              className="input"
+              placeholder="City"
+              value={address.city}
+              onChange={(e) => setAddress({ ...address, city: e.target.value })}
+            />
+            <input
+              className="input"
+              placeholder="Postal code"
+              value={address.postal}
+              onChange={(e) => setAddress({ ...address, postal: e.target.value })}
+            />
+          </div>
+        </div>
+
+        {/* Offer code */}
         <div className="card p-4">
           <h2 className="font-serif text-lg">Have an offer code?</h2>
           <p className="mb-2 text-xs text-ink/50">
@@ -172,14 +231,16 @@ export function CheckoutClient({ shippingPaise }: { shippingPaise: number }) {
           <button
             className="btn-primary"
             onClick={payOnline}
-            disabled={busy !== null}
+            disabled={busy !== null || !addressFilled}
+            title={!addressFilled ? "Fill address first" : ""}
           >
             {busy === "razorpay" ? "Starting…" : "Pay online (Razorpay)"}
           </button>
           <button
             className="btn-outline"
             onClick={placeCod}
-            disabled={busy !== null}
+            disabled={busy !== null || !addressFilled}
+            title={!addressFilled ? "Fill address first" : ""}
           >
             {busy === "cod" ? "Placing…" : "Cash on Delivery"}
           </button>

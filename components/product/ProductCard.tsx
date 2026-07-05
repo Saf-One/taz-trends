@@ -34,7 +34,7 @@ export function ProductCard({ product }: { product: ProductWithRelations }) {
         )}
       </div>
       <div className="p-3">
-        <h3 className="line-clamp-1 font-serif text-sm text-ink">{product.title}</h3>
+        <h3 className="line-clamp-2 font-serif text-sm text-ink">{product.title}</h3>
         <p className="mt-1 text-sm text-wine">
           {hasVariants(product) ? "From " : ""}
           {formatPaise(price)}

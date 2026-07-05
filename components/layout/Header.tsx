@@ -26,9 +26,6 @@ export function Header({
         </Link>
 
         <nav className="flex items-center gap-4 text-sm">
-          <Link href="/" className="hover:text-wine">
-            Shop
-          </Link>
           <Link href="/quote" className="hover:text-wine">
             Request a quote
           </Link>

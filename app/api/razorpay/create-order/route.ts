@@ -20,6 +20,7 @@ export async function POST(request: NextRequest) {
 
   const body = await request.json().catch(() => ({}));
   const offerCode: string | undefined = body?.offerCode;
+  const address = body?.address || {};
 
   // Server-computed subtotal — never trust a client amount.
   const { data: subtotal, error: subErr } = await supabase.rpc(
@@ -63,6 +64,7 @@ export async function POST(request: NextRequest) {
       p_shipping_paise: SHIPPING_FLAT_PAISE,
       p_offer_id: offer?.id ?? null,
       p_razorpay_order_id: rzpOrder.id,
+      p_address_json: JSON.stringify(address),
     },
   );
   if (orderErr) {

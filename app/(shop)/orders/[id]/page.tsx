@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth/session";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getOrderWithItems } from "@/lib/checkout/orders";
 import { formatPaise } from "@/lib/config";
+import type { Product } from "@/types/db";
 
 export const metadata = { title: "Order" };
 export const dynamic = "force-dynamic";
@@ -27,6 +29,17 @@ export default async function OrderPage({
   if (!result) notFound();
   const { order, items } = result;
 
+  // Fetch product names for display
+  const supabase = createSupabaseServerClient();
+  const { data: products } = await supabase
+    .from("products")
+    .select("id, title")
+    .in(
+      "id",
+      items.map((it) => it.product_id),
+    );
+  const productMap = new Map(products?.map((p) => [p.id, p.title]) || []);
+
   return (
     <div className="mx-auto max-w-2xl">
       <div className="card p-6">
@@ -46,8 +59,10 @@ export default async function OrderPage({
           {items.map((it) => (
             <li key={it.id} className="flex justify-between py-2 text-sm">
               <span>
-                {it.quantity} × item{" "}
-                <span className="text-ink/40">{it.product_id.slice(0, 8)}</span>
+                {it.quantity} ×{" "}
+                <span className="font-medium">
+                  {productMap.get(it.product_id) || "Product"}
+                </span>
               </span>
               <span>{formatPaise(it.unit_price * it.quantity)}</span>
             </li>
