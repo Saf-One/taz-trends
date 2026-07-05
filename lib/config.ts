@@ -15,12 +15,15 @@ export const SHIPPING_FLAT_PAISE = Number(
   process.env.SHIPPING_FLAT_PAISE ?? 0,
 );
 
-// SITE_URL: comma-separated list (e.g. "http://localhost:3000,https://example.com")
-// Primary (first) used as default; parse into array for multi-env support.
+// SITE_URL: comma-separated list (e.g. "http://localhost:3000,example.com,https://other.com")
+// Auto-adds https:// to bare domains. Primary (first) used as default.
 const siteUrlRaw = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 const siteUrls = siteUrlRaw
   .split(",")
-  .map((url) => url.trim().replace(/\/$/, ""))
+  .map((url) => {
+    const trimmed = url.trim().replace(/\/$/, "");
+    return trimmed.startsWith("http") ? trimmed : `https://${trimmed}`;
+  })
   .filter(Boolean);
 export const SITE_URL = siteUrls[0] || "http://localhost:3000";
 export const SITE_URLS = siteUrls;
