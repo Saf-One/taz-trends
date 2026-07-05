@@ -72,11 +72,13 @@ export default function SignInPage({
       {/* Sign-in panel */}
       <section className="flex flex-col items-center justify-center bg-logo-bg px-6 py-12">
         <div className="w-full max-w-sm">
-          <div className="w-40">
-            <BrandLogo />
+          <div className="mb-8 flex justify-center">
+            <div className="w-56">
+              <BrandLogo />
+            </div>
           </div>
 
-          <p className="mt-10 text-xs uppercase tracking-[0.25em] text-gold">
+          <p className="text-xs uppercase tracking-[0.25em] text-gold">
             Welcome
           </p>
           <h1 className="mt-2 font-serif text-3xl text-ink">
