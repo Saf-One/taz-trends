@@ -67,7 +67,7 @@ export function adminOrderEmail(
     ${itemsTable(items)}
     <div class="row total"><span>Total</span><span>${formatPaise(order.total)}</span></div>
     ${addrBlock}
-    <a href="${SITE_URL}/admin/orders/${order.id}" class="btn">View order →</a>
+    <a href="${SITE_URL}/admin/orders/${order.id}" class="btn" style="display:inline-block;margin-top:20px;padding:12px 28px;background:#7b2d3b;color:#fff!important;text-decoration:none;border-radius:6px;font-size:14px">View order →</a>
   `;
 
   return {
@@ -101,7 +101,7 @@ export function customerOrderEmail(
     ${itemsTable(items)}
     <div class="row total"><span>Total</span><span>${formatPaise(order.total)}</span></div>
     ${addrBlock}
-    <a href="${SITE_URL}/orders/${order.id}" class="btn">View order →</a>
+    <a href="${SITE_URL}/orders/${order.id}" class="btn" style="display:inline-block;margin-top:20px;padding:12px 28px;background:#7b2d3b;color:#fff!important;text-decoration:none;border-radius:6px;font-size:14px">View order →</a>
   `;
 
   return {
@@ -129,7 +129,7 @@ export function customerStatusEmail(
     <p style="margin-top:0">${greeting}</p>
     <p>${msg}</p>
     <p style="font-size:13px;color:#888">Order #${order.id.slice(0, 8)}</p>
-    <a href="${SITE_URL}/orders/${order.id}" class="btn">View order →</a>
+    <a href="${SITE_URL}/orders/${order.id}" class="btn" style="display:inline-block;margin-top:20px;padding:12px 28px;background:#7b2d3b;color:#fff!important;text-decoration:none;border-radius:6px;font-size:14px">View order →</a>
   `;
 
   return {
