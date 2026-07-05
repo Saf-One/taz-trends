@@ -11,8 +11,13 @@ const STATUS_NOTIFY = new Set<OrderStatus>(["shipped", "delivered", "cancelled",
 /**
  * Admin: move an order to a new status, enforcing allowed transitions.
  * Covers the settled COD flow cash_on_delivery -> delivered | returned.
+ * Optionally stores a tracking_url when marking as shipped.
  */
-export async function updateOrderStatus(orderId: string, next: OrderStatus) {
+export async function updateOrderStatus(
+  orderId: string,
+  next: OrderStatus,
+  formData: FormData,
+) {
   const supabase = createSupabaseServerClient();
 
   const { data: order, error: readErr } = await supabase
@@ -26,16 +31,27 @@ export async function updateOrderStatus(orderId: string, next: OrderStatus) {
     throw new Error(`Illegal transition ${order.status} -> ${next}`);
   }
 
+  const trackingUrl = formData.get("tracking_url") as string | null;
+
+  const updateFields: Record<string, unknown> = { status: next };
+  if (next === "shipped" && trackingUrl) {
+    updateFields.tracking_url = trackingUrl;
+  }
+
   const { error } = await supabase
     .from("orders")
-    .update({ status: next })
+    .update(updateFields)
     .eq("id", orderId);
   if (error) throw new Error(error.message);
   revalidatePath("/admin/orders");
   revalidatePath(`/admin/orders/${orderId}`);
 
   if (STATUS_NOTIFY.has(next)) {
-    void sendStatusEmail({ ...order, status: next } as Order, next);
+    void sendStatusEmail(
+      { ...order, ...updateFields } as Order,
+      next,
+      trackingUrl ?? null,
+    );
   }
 }
 

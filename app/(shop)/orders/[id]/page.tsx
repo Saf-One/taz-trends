@@ -100,6 +100,20 @@ export default async function OrderPage({
           </div>
         )}
 
+        {order.tracking_url && (
+          <div className="mt-4 rounded-md bg-blush/60 p-3 text-sm">
+            <p className="mb-1 text-xs uppercase tracking-wider text-ink/50">Tracking</p>
+            <a
+              href={order.tracking_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-wine underline underline-offset-2"
+            >
+              Track shipment →
+            </a>
+          </div>
+        )}
+
         <div className="mt-4 space-y-1 border-t border-ink/10 pt-4 text-sm">
           <div className="flex justify-between">
             <span>Subtotal</span>

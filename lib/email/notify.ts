@@ -95,6 +95,7 @@ export async function sendOrderEmails(
 export async function sendStatusEmail(
   order: Order,
   newStatus: OrderStatus,
+  trackingUrl: string | null = null,
 ): Promise<void> {
   const resend = getResend();
   if (!resend) return;
@@ -108,7 +109,7 @@ export async function sendStatusEmail(
 
   if (!profile?.email) return;
 
-  const { subject, html } = customerStatusEmail(order, newStatus, profile.full_name);
+  const { subject, html } = customerStatusEmail(order, newStatus, profile.full_name, trackingUrl);
   await resend.emails
     .send({ from: FROM, to: [profile.email], subject, html })
     .catch((e) => console.error("[email] status email failed:", e));

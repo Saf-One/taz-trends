@@ -80,7 +80,16 @@ export default async function AdminOrderDetail({
             Move to:
           </span>
           {nexts.map((next) => (
-            <form key={next} action={updateOrderStatus.bind(null, order.id, next)}>
+            <form key={next} action={updateOrderStatus.bind(null, order.id, next)} className={next === "shipped" ? "flex flex-wrap items-center gap-2" : ""}>
+              {next === "shipped" && (
+                <input
+                  type="url"
+                  name="tracking_url"
+                  placeholder="Tracking link (optional)"
+                  defaultValue={order.tracking_url ?? ""}
+                  className="w-56 rounded border border-ink/20 px-3 py-1.5 text-xs text-ink outline-none focus:border-wine"
+                />
+              )}
               <button className="btn-outline btn-xs">Mark {next.replace(/_/g, " ")}</button>
             </form>
           ))}

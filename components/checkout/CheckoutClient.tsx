@@ -502,18 +502,10 @@ export function CheckoutClient({ shippingPaise }: { shippingPaise: number }) {
                   )}
                 </button>
                 <button
-                  className="rounded-md border-2 border-wine bg-white px-4 py-3 text-sm font-medium text-wine shadow-sm transition-colors hover:bg-wine/5 disabled:opacity-50"
-                  onClick={placeCod}
-                  disabled={busy !== null}
+                  className="rounded-md border-2 border-ink/10 bg-ink/5 px-4 py-3 text-sm font-medium text-ink/30 shadow-sm cursor-not-allowed"
+                  disabled={true}
                 >
-                  {busy === "cod" ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-wine border-t-transparent" />
-                      Placing…
-                    </span>
-                  ) : (
-                    "Cash on Delivery (COD)"
-                  )}
+                  Cash on Delivery (COD) — currently unavailable
                 </button>
               </div>
             </>

@@ -90,6 +90,7 @@ export interface Order {
   shipping_paise: number;
   total: number; // paise
   address_json: OrderAddress | null;
+  tracking_url: string | null;
   created_at: string;
   updated_at: string;
 }

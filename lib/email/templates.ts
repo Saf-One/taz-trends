@@ -115,6 +115,7 @@ export function customerStatusEmail(
   order: Order,
   newStatus: string,
   customerName: string | null,
+  trackingUrl: string | null = null,
 ): { subject: string; html: string } {
   const STATUS_MSG: Record<string, string> = {
     shipped: "Your order has been shipped and is on the way!",
@@ -125,9 +126,14 @@ export function customerStatusEmail(
   const msg = STATUS_MSG[newStatus] ?? `Your order status is now: ${newStatus}.`;
   const greeting = customerName ? `Hi ${customerName.split(" ")[0]},` : "Hi,";
 
+  const trackingBlock = trackingUrl
+    ? `<p style="margin-top:16px"><a href="${trackingUrl}" class="btn" style="display:inline-block;padding:12px 28px;background:#7b2d3b;color:#fff!important;text-decoration:none;border-radius:6px;font-size:14px">Track your shipment →</a></p>`
+    : "";
+
   const body = `
     <p style="margin-top:0">${greeting}</p>
     <p>${msg}</p>
+    ${trackingBlock}
     <p style="font-size:13px;color:#888">Order #${order.id.slice(0, 8)}</p>
     <a href="${SITE_URL}/orders/${order.id}" class="btn" style="display:inline-block;margin-top:20px;padding:12px 28px;background:#7b2d3b;color:#fff!important;text-decoration:none;border-radius:6px;font-size:14px">View order →</a>
   `;

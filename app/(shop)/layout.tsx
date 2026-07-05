@@ -130,21 +130,6 @@ export default async function ShopLayout({
               <p className="text-[10px] text-ink/40">
                 &copy; {new Date().getFullYear()} Taz Trends. All rights reserved.
               </p>
-              <div className="flex items-center gap-2">
-                {/* Payment method icons */}
-                <span className="flex h-6 w-10 items-center justify-center rounded border border-ink/10 bg-white text-[8px] font-bold text-ink/40">
-                  Visa
-                </span>
-                <span className="flex h-6 w-10 items-center justify-center rounded border border-ink/10 bg-white text-[8px] font-bold text-ink/40">
-                  MC
-                </span>
-                <span className="flex h-6 w-10 items-center justify-center rounded border border-ink/10 bg-white text-[8px] font-bold text-green-600">
-                  UPI
-                </span>
-                <span className="flex h-6 w-10 items-center justify-center rounded border border-ink/10 bg-white text-[8px] font-bold text-ink/40">
-                  COD
-                </span>
-              </div>
             </div>
           </div>
         </footer>
