@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createSupabaseBrowserClient } from "@/lib/supabase/client";
-import { useCart, type CartLine } from "@/lib/cart/CartProvider";
+import { useCart } from "@/lib/cart/CartProvider";
+import { useCartProducts } from "@/lib/cart/useCartProducts";
 import { formatPaise, STORE_NAME } from "@/lib/config";
-import type { ProductWithRelations } from "@/types/db";
 
 // Razorpay's checkout widget is loaded from their CDN and has no bundled
 // types; typing the global loosely is the standard, justified exception.
@@ -29,10 +28,13 @@ function loadRazorpay(): Promise<boolean> {
   });
 }
 
+const PHONE_RE = /^[6-9]\d{9}$/; // Indian mobile: 10 digits, starts 6-9
+const POSTAL_RE = /^\d{6}$/; // Indian PIN code
+
 export function CheckoutClient({ shippingPaise }: { shippingPaise: number }) {
   const router = useRouter();
   const { lines, count, refresh, ready } = useCart();
-  const [products, setProducts] = useState<Record<string, ProductWithRelations>>({});
+  const { unitPaise, label } = useCartProducts(lines);
   const [offerCode, setOfferCode] = useState("");
   const [address, setAddress] = useState({
     name: "",
@@ -41,43 +43,29 @@ export function CheckoutClient({ shippingPaise }: { shippingPaise: number }) {
     city: "",
     postal: "",
   });
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [busy, setBusy] = useState<null | "cod" | "razorpay">(null);
   const [error, setError] = useState<string | null>(null);
 
-  const addressFilled =
-    address.name.trim() &&
-    address.phone.trim() &&
-    address.street.trim() &&
-    address.city.trim() &&
-    address.postal.trim();
+  const fieldError: Record<string, string | null> = {
+    name: address.name.trim() ? null : "Enter the recipient's name",
+    phone: PHONE_RE.test(address.phone.trim())
+      ? null
+      : "Enter a 10-digit mobile number",
+    street: address.street.trim() ? null : "Enter the street address",
+    city: address.city.trim() ? null : "Enter the city",
+    postal: POSTAL_RE.test(address.postal.trim())
+      ? null
+      : "Enter the 6-digit PIN code",
+  };
+  const addressValid = Object.values(fieldError).every((e) => e === null);
 
-  const productIds = useMemo(
-    () => Array.from(new Set(lines.map((l) => l.product_id))),
-    [lines],
-  );
+  function setField(key: keyof typeof address, value: string) {
+    setAddress((a) => ({ ...a, [key]: value }));
+  }
 
-  useEffect(() => {
-    if (productIds.length === 0) return;
-    const supabase = createSupabaseBrowserClient();
-    supabase
-      .from("products")
-      .select("*, product_images(*), product_variants(*)")
-      .in("id", productIds)
-      .then(({ data }) => {
-        const map: Record<string, ProductWithRelations> = {};
-        (data ?? []).forEach((p) => (map[(p as ProductWithRelations).id] = p as ProductWithRelations));
-        setProducts(map);
-      });
-  }, [productIds]);
-
-  function unitPaise(line: CartLine): number {
-    const p = products[line.product_id];
-    if (!p) return 0;
-    if (line.variant_id) {
-      const v = p.product_variants.find((x) => x.id === line.variant_id);
-      return v?.price_override ?? p.price;
-    }
-    return p.price;
+  function touch(key: string) {
+    setTouched((t) => ({ ...t, [key]: true }));
   }
 
   const subtotal = lines.reduce((s, l) => s + unitPaise(l) * l.quantity, 0);
@@ -163,9 +151,21 @@ export function CheckoutClient({ shippingPaise }: { shippingPaise: number }) {
   if (ready && count === 0) {
     return (
       <p className="text-ink/60">
-        Your cart is empty. <a href="/" className="text-wine underline">Shop now</a>.
+        Your cart is empty.{" "}
+        <a href="/" className="text-wine underline">
+          Shop now
+        </a>
+        .
       </p>
     );
+  }
+
+  const inputCls = (key: string) =>
+    `input ${touched[key] && fieldError[key] ? "border-red-400" : ""}`;
+
+  function FieldHint({ k }: { k: string }) {
+    if (!touched[k] || !fieldError[k]) return null;
+    return <p className="mt-1 text-xs text-red-600">{fieldError[k]}</p>;
   }
 
   return (
@@ -174,37 +174,86 @@ export function CheckoutClient({ shippingPaise }: { shippingPaise: number }) {
         {/* Address */}
         <div className="card space-y-3 p-4">
           <h2 className="font-serif text-lg">Delivery address</h2>
-          <input
-            className="input"
-            placeholder="Full name"
-            value={address.name}
-            onChange={(e) => setAddress({ ...address, name: e.target.value })}
-          />
-          <input
-            className="input"
-            placeholder="Phone"
-            value={address.phone}
-            onChange={(e) => setAddress({ ...address, phone: e.target.value })}
-          />
-          <input
-            className="input"
-            placeholder="Street address"
-            value={address.street}
-            onChange={(e) => setAddress({ ...address, street: e.target.value })}
-          />
+          <div>
+            <label htmlFor="addr-name" className="mb-1 block text-sm text-ink/70">
+              Full name
+            </label>
+            <input
+              id="addr-name"
+              className={inputCls("name")}
+              autoComplete="name"
+              value={address.name}
+              onChange={(e) => setField("name", e.target.value)}
+              onBlur={() => touch("name")}
+            />
+            <FieldHint k="name" />
+          </div>
+          <div>
+            <label htmlFor="addr-phone" className="mb-1 block text-sm text-ink/70">
+              Mobile number
+            </label>
+            <input
+              id="addr-phone"
+              className={inputCls("phone")}
+              type="tel"
+              inputMode="numeric"
+              autoComplete="tel-national"
+              maxLength={10}
+              placeholder="10-digit mobile"
+              value={address.phone}
+              onChange={(e) => setField("phone", e.target.value.replace(/\D/g, ""))}
+              onBlur={() => touch("phone")}
+            />
+            <FieldHint k="phone" />
+          </div>
+          <div>
+            <label htmlFor="addr-street" className="mb-1 block text-sm text-ink/70">
+              Street address
+            </label>
+            <input
+              id="addr-street"
+              className={inputCls("street")}
+              autoComplete="street-address"
+              placeholder="House no., street, area"
+              value={address.street}
+              onChange={(e) => setField("street", e.target.value)}
+              onBlur={() => touch("street")}
+            />
+            <FieldHint k="street" />
+          </div>
           <div className="grid grid-cols-2 gap-2">
-            <input
-              className="input"
-              placeholder="City"
-              value={address.city}
-              onChange={(e) => setAddress({ ...address, city: e.target.value })}
-            />
-            <input
-              className="input"
-              placeholder="Postal code"
-              value={address.postal}
-              onChange={(e) => setAddress({ ...address, postal: e.target.value })}
-            />
+            <div>
+              <label htmlFor="addr-city" className="mb-1 block text-sm text-ink/70">
+                City
+              </label>
+              <input
+                id="addr-city"
+                className={inputCls("city")}
+                autoComplete="address-level2"
+                value={address.city}
+                onChange={(e) => setField("city", e.target.value)}
+                onBlur={() => touch("city")}
+              />
+              <FieldHint k="city" />
+            </div>
+            <div>
+              <label htmlFor="addr-postal" className="mb-1 block text-sm text-ink/70">
+                PIN code
+              </label>
+              <input
+                id="addr-postal"
+                className={inputCls("postal")}
+                inputMode="numeric"
+                autoComplete="postal-code"
+                maxLength={6}
+                value={address.postal}
+                onChange={(e) =>
+                  setField("postal", e.target.value.replace(/\D/g, ""))
+                }
+                onBlur={() => touch("postal")}
+              />
+              <FieldHint k="postal" />
+            </div>
           </div>
         </div>
 
@@ -214,7 +263,11 @@ export function CheckoutClient({ shippingPaise }: { shippingPaise: number }) {
           <p className="mb-2 text-xs text-ink/50">
             Offer codes apply to online (Razorpay) payment only.
           </p>
+          <label htmlFor="offer-code" className="sr-only">
+            Offer code
+          </label>
           <input
+            id="offer-code"
             className="input"
             placeholder="Enter code"
             value={offerCode}
@@ -230,16 +283,16 @@ export function CheckoutClient({ shippingPaise }: { shippingPaise: number }) {
           <button
             className="btn-primary"
             onClick={payOnline}
-            disabled={busy !== null || !addressFilled}
-            title={!addressFilled ? "Fill address first" : ""}
+            disabled={busy !== null || !addressValid}
+            title={!addressValid ? "Fill the delivery address first" : ""}
           >
             {busy === "razorpay" ? "Starting…" : "Pay online (Razorpay)"}
           </button>
           <button
             className="btn-outline"
             onClick={placeCod}
-            disabled={busy !== null || !addressFilled}
-            title={!addressFilled ? "Fill address first" : ""}
+            disabled={busy !== null || !addressValid}
+            title={!addressValid ? "Fill the delivery address first" : ""}
           >
             {busy === "cod" ? "Placing…" : "Cash on Delivery"}
           </button>
@@ -248,7 +301,22 @@ export function CheckoutClient({ shippingPaise }: { shippingPaise: number }) {
 
       <aside className="card h-fit p-4">
         <h2 className="font-serif text-lg">Summary</h2>
-        <div className="mt-3 space-y-1 text-sm">
+        <ul className="mt-3 space-y-1 text-sm text-ink/70">
+          {lines.map((l) => (
+            <li
+              key={`${l.product_id}:${l.variant_id ?? "null"}`}
+              className="flex justify-between gap-2"
+            >
+              <span className="truncate">
+                {l.quantity} × {label(l)}
+              </span>
+              <span className="shrink-0">
+                {formatPaise(unitPaise(l) * l.quantity)}
+              </span>
+            </li>
+          ))}
+        </ul>
+        <div className="mt-3 space-y-1 border-t border-ink/10 pt-2 text-sm">
           <div className="flex justify-between">
             <span>Subtotal</span>
             <span>{formatPaise(subtotal)}</span>

@@ -51,6 +51,7 @@ export function AddToCartForm({ product }: { product: ProductWithRelations }) {
 
   function onIncrement() {
     if (!cartLine) return;
+    if (cartLine.quantity >= stock) return; // can't exceed available stock
     setBusy(true);
     setQty(cartLine, cartLine.quantity + 1);
     setBusy(false);
@@ -98,9 +99,10 @@ export function AddToCartForm({ product }: { product: ProductWithRelations }) {
           </button>
           <span className="flex-1 text-center font-medium">{cartQty}</span>
           <button
-            className="flex-1 rounded-md border border-wine/40 px-3 py-2 font-bold text-wine hover:bg-wine/5"
+            className="flex-1 rounded-md border border-wine/40 px-3 py-2 font-bold text-wine hover:bg-wine/5 disabled:border-ink/20 disabled:text-ink/30"
             onClick={onIncrement}
-            disabled={busy}
+            disabled={busy || cartQty >= stock}
+            title={cartQty >= stock ? "No more stock available" : ""}
           >
             +
           </button>

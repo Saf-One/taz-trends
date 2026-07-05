@@ -1,58 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { createSupabaseBrowserClient } from "@/lib/supabase/client";
-import { useCart, type CartLine } from "@/lib/cart/CartProvider";
+import { useCart } from "@/lib/cart/CartProvider";
+import { useCartProducts } from "@/lib/cart/useCartProducts";
 import { publicImageUrl } from "@/lib/catalog/images";
 import { formatPaise } from "@/lib/config";
-import type { ProductWithRelations } from "@/types/db";
 
 export function CartView() {
   const { lines, setQty, remove, ready } = useCart();
-  const [products, setProducts] = useState<Record<string, ProductWithRelations>>({});
-
-  const productIds = useMemo(
-    () => Array.from(new Set(lines.map((l) => l.product_id))),
-    [lines],
-  );
-
-  useEffect(() => {
-    if (productIds.length === 0) {
-      setProducts({});
-      return;
-    }
-    const supabase = createSupabaseBrowserClient();
-    supabase
-      .from("products")
-      .select("*, product_images(*), product_variants(*)")
-      .in("id", productIds)
-      .then(({ data }) => {
-        const map: Record<string, ProductWithRelations> = {};
-        (data ?? []).forEach((p) => (map[(p as ProductWithRelations).id] = p as ProductWithRelations));
-        setProducts(map);
-      });
-  }, [productIds]);
-
-  function unitPaise(line: CartLine): number {
-    const p = products[line.product_id];
-    if (!p) return 0;
-    if (line.variant_id) {
-      const v = p.product_variants.find((x) => x.id === line.variant_id);
-      return v?.price_override ?? p.price;
-    }
-    return p.price;
-  }
-
-  function label(line: CartLine): string {
-    const p = products[line.product_id];
-    if (!p) return "…";
-    if (line.variant_id) {
-      const v = p.product_variants.find((x) => x.id === line.variant_id);
-      return `${p.title}${v ? ` - ${v.variant_value}` : ""}`;
-    }
-    return p.title;
-  }
+  const { products, unitPaise, label, lineStock } = useCartProducts(lines);
 
   const subtotal = lines.reduce((sum, l) => sum + unitPaise(l) * l.quantity, 0);
 
@@ -80,12 +36,19 @@ export function CartView() {
               p?.product_images[0];
             const img = publicImageUrl(primary?.storage_path);
             const key = `${line.product_id}:${line.variant_id ?? "null"}`;
+            const atStock = line.quantity >= lineStock(line);
             return (
               <li key={key} className="card flex gap-4 p-3">
                 <div className="h-24 w-20 shrink-0 overflow-hidden rounded bg-blush">
                   {img && (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={img} alt="" className="h-full w-full object-cover" />
+                    <img
+                      src={img}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      className="h-full w-full object-cover"
+                    />
                   )}
                 </div>
                 <div className="flex flex-1 flex-col justify-between">
@@ -95,6 +58,7 @@ export function CartView() {
                       className="text-lg text-ink/30 hover:text-red-600"
                       onClick={() => remove(line)}
                       title="Remove"
+                      aria-label={`Remove ${label(line)} from cart`}
                     >
                       ✕
                     </button>
@@ -102,7 +66,8 @@ export function CartView() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <button
-                        className="text-lg font-bold text-ink/60 hover:text-ink"
+                        className="flex h-8 w-8 items-center justify-center text-lg font-bold text-ink/60 hover:text-ink"
+                        aria-label="Decrease quantity"
                         onClick={() => {
                           if (line.quantity <= 1) {
                             remove(line);
@@ -113,9 +78,14 @@ export function CartView() {
                       >
                         −
                       </button>
-                      <span className="w-6 text-center text-sm font-medium">{line.quantity}</span>
+                      <span className="w-6 text-center text-sm font-medium">
+                        {line.quantity}
+                      </span>
                       <button
-                        className="text-lg font-bold text-ink/60 hover:text-ink"
+                        className="flex h-8 w-8 items-center justify-center text-lg font-bold text-ink/60 hover:text-ink disabled:opacity-30"
+                        aria-label="Increase quantity"
+                        disabled={atStock}
+                        title={atStock ? "No more stock available" : ""}
                         onClick={() => setQty(line, line.quantity + 1)}
                       >
                         +

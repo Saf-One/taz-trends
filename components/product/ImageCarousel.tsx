@@ -81,6 +81,8 @@ export function ImageCarousel({
         <img
           src={images[0].src}
           alt={images[0].alt}
+          loading="lazy"
+          decoding="async"
           className="h-full w-full object-cover"
         />
       </div>
@@ -149,6 +151,8 @@ export function ImageCarousel({
               src={img.src}
               alt={img.alt}
               draggable={false}
+              loading={i === 1 ? "eager" : "lazy"} // pos 1 = first visible slide
+              decoding="async"
               className="h-full w-full shrink-0 object-cover"
             />
           ))}
@@ -202,6 +206,8 @@ export function ImageCarousel({
               <img
                 src={img.src}
                 alt=""
+                loading="lazy"
+                decoding="async"
                 className="h-full w-full object-cover"
               />
             </button>

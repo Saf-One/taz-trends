@@ -34,7 +34,11 @@ export function Header({
               Admin
             </Link>
           )}
-          <Link href="/cart" className="relative hover:text-wine">
+          <Link
+            href="/cart"
+            className="relative px-1 py-2 hover:text-wine"
+            aria-label={`Cart, ${count} item${count === 1 ? "" : "s"}`}
+          >
             Cart
             {count > 0 && (
               <span className="ml-1 rounded-full bg-wine px-1.5 py-0.5 text-xs text-white">

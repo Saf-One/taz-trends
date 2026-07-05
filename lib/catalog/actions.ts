@@ -24,24 +24,41 @@ function generateSlug(title: string): string {
 export async function createProduct(formData: FormData) {
   const supabase = createSupabaseServerClient();
   const title = String(formData.get("title") ?? "").trim();
-  const slug = generateSlug(title);
+  let slug = generateSlug(title);
 
-  const { data, error } = await supabase
-    .from("products")
-    .insert({
-      title,
-      slug,
-      description: String(formData.get("description") ?? "").trim() || null,
-      price: rupeesToPaise(formData.get("price")),
-      stock: Number(formData.get("stock") ?? 0),
-      status: (String(formData.get("status") ?? "draft") as ProductStatus),
-    })
-    .select("id")
-    .single();
+  const description = String(formData.get("description") ?? "").trim() || null;
+  const price = rupeesToPaise(formData.get("price"));
+  const stock = Number(formData.get("stock") ?? 0);
+  const status = String(formData.get("status") ?? "draft") as ProductStatus;
 
-  if (error) throw new Error(error.message);
-  revalidatePath("/admin/products");
-  redirect(`/admin/products/${data.id}/edit`);
+  // Retry with suffix if slug collision
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const trySlug = attempt === 0 ? slug : `${slug}-${attempt}`;
+    const { data, error } = await supabase
+      .from("products")
+      .insert({
+        title,
+        slug: trySlug,
+        description,
+        price,
+        stock,
+        status,
+      })
+      .select("id")
+      .single();
+
+    if (!error) {
+      revalidatePath("/admin/products");
+      redirect(`/admin/products/${data.id}/edit`);
+    }
+
+    // Not a unique constraint violation; real error
+    if (!error.message.includes("unique")) {
+      throw new Error(error.message);
+    }
+  }
+
+  throw new Error("Could not generate unique slug after 5 attempts");
 }
 
 export async function updateProduct(productId: string, formData: FormData) {

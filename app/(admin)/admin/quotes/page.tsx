@@ -28,8 +28,23 @@ export default async function AdminQuotes() {
                   </span>
                 </p>
                 <p className="text-xs text-ink/50">
-                  {q.email}
-                  {q.phone ? ` · ${q.phone}` : ""}
+                  <a
+                    href={`mailto:${q.email}`}
+                    className="hover:text-wine hover:underline"
+                  >
+                    {q.email}
+                  </a>
+                  {q.phone && (
+                    <>
+                      {" "}· {" "}
+                      <a
+                        href={`tel:${q.phone}`}
+                        className="hover:text-wine hover:underline"
+                      >
+                        {q.phone}
+                      </a>
+                    </>
+                  )}
                 </p>
                 <p className="mt-2 text-sm text-ink/80">{q.message}</p>
               </div>

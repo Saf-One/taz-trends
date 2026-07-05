@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import ReactMarkdown from "react-markdown";
 import { getProductBySlug } from "@/lib/catalog/queries";
-import { carouselImages } from "@/lib/catalog/images";
+import { carouselImages, publicImageUrl } from "@/lib/catalog/images";
 import { AddToCartForm } from "@/components/product/AddToCartForm";
 import { ImageCarousel } from "@/components/product/ImageCarousel";
 
@@ -14,7 +14,26 @@ export async function generateMetadata({
   params: { slug: string };
 }): Promise<Metadata> {
   const product = await getProductBySlug(params.slug).catch(() => null);
-  return { title: product?.title ?? "Product" };
+  if (!product) return { title: "Product" };
+
+  const desc =
+    product.description
+      ?.split("\n")[0]
+      ?.substring(0, 160)
+      .replace(/[#*_~`]/g, "") || "Discover this beautiful piece";
+
+  const primaryImage = product.product_images?.[0];
+  const ogImage = primaryImage ? publicImageUrl(primaryImage.storage_path) : null;
+
+  return {
+    title: product.title,
+    description: desc,
+    openGraph: {
+      title: product.title,
+      description: desc,
+      ...(ogImage && { images: [{ url: ogImage, width: 400, height: 500 }] }),
+    },
+  };
 }
 
 export default async function ProductPage({
