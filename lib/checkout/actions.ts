@@ -3,7 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isValidTransition } from "@/lib/checkout/status";
-import type { OrderStatus, QuoteStatus } from "@/types/db";
+import { sendStatusEmail } from "@/lib/email/notify";
+import type { Order, OrderStatus, QuoteStatus } from "@/types/db";
+
+const STATUS_NOTIFY = new Set<OrderStatus>(["shipped", "delivered", "cancelled", "returned"]);
 
 /**
  * Admin: move an order to a new status, enforcing allowed transitions.
@@ -14,7 +17,7 @@ export async function updateOrderStatus(orderId: string, next: OrderStatus) {
 
   const { data: order, error: readErr } = await supabase
     .from("orders")
-    .select("status, payment_method")
+    .select("*")
     .eq("id", orderId)
     .single();
   if (readErr) throw new Error(readErr.message);
@@ -30,6 +33,10 @@ export async function updateOrderStatus(orderId: string, next: OrderStatus) {
   if (error) throw new Error(error.message);
   revalidatePath("/admin/orders");
   revalidatePath(`/admin/orders/${orderId}`);
+
+  if (STATUS_NOTIFY.has(next)) {
+    void sendStatusEmail({ ...order, status: next } as Order, next);
+  }
 }
 
 export async function updateQuoteStatus(quoteId: string, next: QuoteStatus) {

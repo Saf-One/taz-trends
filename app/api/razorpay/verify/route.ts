@@ -2,6 +2,8 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { verifyPaymentSignature } from "@/lib/checkout/razorpay";
+import { sendOrderEmails } from "@/lib/email/notify";
+import type { Order } from "@/types/db";
 
 /**
  * Verify the Razorpay checkout callback. On a valid signature, mark the
@@ -60,6 +62,21 @@ export async function POST(request: NextRequest) {
       .eq("user_id", user.id)
       .maybeSingle();
     if (cart) await admin.from("cart_items").delete().eq("cart_id", cart.id);
+
+    // Fetch updated order for email (needs paid status)
+    const { data: updatedOrder } = await admin
+      .from("orders")
+      .select("*")
+      .eq("id", order.id)
+      .maybeSingle();
+
+    if (updatedOrder) {
+      void sendOrderEmails(
+        updatedOrder as Order,
+        user.email ?? "",
+        user.user_metadata?.full_name ?? null,
+      );
+    }
   }
 
   return NextResponse.json({ ok: true, orderId: order.id });

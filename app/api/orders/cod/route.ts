@@ -1,6 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { SHIPPING_FLAT_PAISE } from "@/lib/config";
+import { sendOrderEmails } from "@/lib/email/notify";
+import type { Order } from "@/types/db";
 
 /**
  * Place a Cash-on-Delivery order. COD is placed IMMEDIATELY at status
@@ -35,5 +37,13 @@ export async function POST(request: NextRequest) {
   }
 
   const order = Array.isArray(data) ? data[0] : data;
+
+  // Fire-and-forget emails (never fail the order response)
+  void sendOrderEmails(
+    order as Order,
+    user.email ?? "",
+    user.user_metadata?.full_name ?? null,
+  );
+
   return NextResponse.json({ orderId: order.id });
 }
