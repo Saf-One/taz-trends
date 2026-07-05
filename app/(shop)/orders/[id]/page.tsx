@@ -41,8 +41,8 @@ export default async function OrderPage({
   const productMap = new Map(products?.map((p) => [p.id, p.title]) || []);
 
   return (
-    <div className="mx-auto max-w-2xl">
-      <div className="card p-6">
+    <div className="mx-auto w-full max-w-2xl">
+      <div className="card p-4 sm:p-6">
         <div className="flex items-center justify-between">
           <h1 className="font-serif text-2xl text-ink">Order confirmed</h1>
           <span className="rounded-full bg-blush px-3 py-1 text-xs text-wine">

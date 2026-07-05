@@ -70,7 +70,7 @@ export function CartView() {
   }
 
   return (
-    <div className="grid gap-8 lg:grid-cols-3">
+    <div className="grid gap-6 md:gap-8 lg:grid-cols-3">
       <div className="lg:col-span-2">
         <ul className="space-y-4">
           {lines.map((line) => {

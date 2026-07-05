@@ -149,8 +149,7 @@ export function CheckoutClient({ shippingPaise }: { shippingPaise: number }) {
         });
         const vj = await vr.json();
         if (vr.ok) {
-          // Don't refresh (cart still needed for next page). Just navigate.
-          // Verify route will clear cart after confirming payment server-side.
+          refresh();
           router.push(`/orders/${vj.orderId}`);
         } else {
           setError("Payment could not be verified. If charged, contact us.");
@@ -170,7 +169,7 @@ export function CheckoutClient({ shippingPaise }: { shippingPaise: number }) {
   }
 
   return (
-    <div className="grid gap-8 lg:grid-cols-3">
+    <div className="grid gap-6 md:gap-8 lg:grid-cols-3">
       <div className="lg:col-span-2 space-y-4">
         {/* Address */}
         <div className="card space-y-3 p-4">

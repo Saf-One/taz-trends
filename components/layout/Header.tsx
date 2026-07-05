@@ -16,7 +16,7 @@ export function Header({
   return (
     <header className="border-b border-ink/10">
       <div className="container-page flex h-16 items-center justify-between">
-        <Link href="/" className="block h-full w-32">
+        <Link href="/" className="block h-full w-24 sm:w-32">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/images/navbar/logo_navbar.png"
@@ -25,7 +25,7 @@ export function Header({
           />
         </Link>
 
-        <nav className="flex items-center gap-4 text-sm">
+        <nav className="flex items-center gap-2 text-xs sm:gap-4 sm:text-sm">
           <Link href="/quote" className="hover:text-wine">
             Request a quote
           </Link>
