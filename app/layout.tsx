@@ -2,28 +2,61 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { STORE_NAME, SITE_URL } from "@/lib/config";
 import { ToastProvider } from "@/lib/notifications/ToastProvider";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { homeSchemaGraph } from "@/lib/seo/schemas";
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+  ],
 };
 
 const OG_IMAGE = "/images/brand/brand_logo.jpg";
+const OG_IMAGE_FULL = `${SITE_URL.replace(/\/$/, "")}/images/brand/brand_logo.jpg`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${STORE_NAME} - Women's Ethnic Fashion`,
+    default: `${STORE_NAME} - Women's Ethnic Fashion Online | Indian Wear & Traditional Outfits`,
     template: `%s · ${STORE_NAME}`,
   },
-  description: "Women's ethnic fashion and outfits.",
+  description:
+    "Shop women's ethnic fashion at Taz Trends. Handpicked Indian ethnic wear, traditional outfits, and modern styles. Free shipping across India. Quality craftsmanship.",
+  robots: {
+    index: true,
+    follow: true,
+    "max-snippet": 150,
+    "max-image-preview": "large",
+    "max-video-preview": -1,
+  },
   openGraph: {
+    type: "website",
+    locale: "en_IN",
     siteName: STORE_NAME,
-    images: [{ url: OG_IMAGE, width: 800, height: 800, alt: STORE_NAME }],
+    title: `${STORE_NAME} - Women's Ethnic Fashion Online`,
+    description:
+      "Shop women's ethnic fashion at Taz Trends. Handpicked Indian ethnic wear, traditional outfits, and modern styles. Free shipping across India.",
+    url: SITE_URL,
+    images: [
+      {
+        url: OG_IMAGE_FULL,
+        width: 1200,
+        height: 630,
+        alt: STORE_NAME,
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    images: [OG_IMAGE],
+    title: `${STORE_NAME} - Women's Ethnic Fashion Online`,
+    description:
+      "Shop women's ethnic fashion at Taz Trends. Handpicked Indian ethnic wear, traditional outfits, and modern styles.",
+    images: [OG_IMAGE_FULL],
+  },
+  alternates: {
+    canonical: SITE_URL,
   },
   icons: {
     icon: "/images/favicon/favicon.ico",
@@ -56,6 +89,10 @@ export const metadata: Metadata = {
     ],
   },
   manifest: "/images/favicon/site.webmanifest",
+  other: {
+    "geo.region": "IN",
+    "geo.placename": "India",
+  },
 };
 
 export default function RootLayout({
@@ -80,6 +117,10 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen antialiased">
+        {/* Preconnect to image origin */}
+        <link rel="preconnect" href={process.env.NEXT_PUBLIC_SUPABASE_URL || ""} />
+        <link rel="dns-prefetch" href={process.env.NEXT_PUBLIC_SUPABASE_URL || ""} />
+        <JsonLd data={homeSchemaGraph()} />
         <ToastProvider>{children}</ToastProvider>
       </body>
     </html>

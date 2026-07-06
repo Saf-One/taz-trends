@@ -9,8 +9,13 @@ import { DetailClient } from "./DetailClient";
 import { ShareButton } from "./ShareButton";
 import { Markdown } from "@/components/ui/Markdown";
 import type { ProductWithRelations } from "@/types/db";
-import { formatPaise } from "@/lib/config";
+import { formatPaise, SITE_URL } from "@/lib/config";
 import { displayPricePaise, hasVariants } from "@/lib/catalog/queries";
+import { JsonLd } from "@/components/seo/JsonLd";
+import {
+  productSchema,
+  breadcrumbSchema,
+} from "@/lib/seo/schemas";
 
 export const dynamic = "force-dynamic";
 
@@ -34,9 +39,13 @@ export async function generateMetadata({
   return {
     title: product.title,
     description: desc,
+    alternates: {
+      canonical: `${SITE_URL}/products/${product.slug}`,
+    },
     openGraph: {
       title: product.title,
       description: desc,
+      url: `${SITE_URL}/products/${product.slug}`,
       ...(ogImage && { images: [{ url: ogImage, width: 400, height: 500 }] }),
     },
   };
@@ -92,6 +101,26 @@ export default async function ProductPage({
 
   return (
     <>
+      {/* JSON-LD structured data */}
+      <JsonLd
+        data={productSchema({
+          name: product.title,
+          description: product.description,
+          image: images[0]?.src ?? null,
+          sku: product.slug,
+          pricePaise: displayPricePaise(product),
+          availability: soldOut ? "OutOfStock" : "InStock",
+          productUrl: `${SITE_URL}/products/${product.slug}`,
+        })}
+      />
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: "Home", url: "/" },
+          { name: "Products", url: "/" },
+          { name: product.title, url: `/products/${product.slug}` },
+        ])}
+      />
+
       <DetailClient product={product} />
 
       {/* Breadcrumbs */}
