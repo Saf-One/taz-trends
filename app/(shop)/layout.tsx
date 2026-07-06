@@ -24,6 +24,7 @@ export default async function ShopLayout({
           style={{
             backgroundImage:
               'linear-gradient(rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0.65)), url(/images/body/logo_flower.png)',
+            backgroundAttachment: 'fixed',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
           }}

@@ -99,7 +99,7 @@ export default async function EditProduct({
         <div className="grid grid-cols-2 gap-4">
           <label className="block">
             <span className="mb-1 block text-sm font-medium text-ink/70">
-              Price (₹) — used when no variants
+              Price (₹) - used when no variants
             </span>
             <div className="relative">
               <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-ink/30">
@@ -116,7 +116,7 @@ export default async function EditProduct({
           </label>
           <label className="block">
             <span className="mb-1 block text-sm font-medium text-ink/70">
-              Stock — used when no variants
+              Stock - used when no variants
             </span>
             <input
               name="stock"

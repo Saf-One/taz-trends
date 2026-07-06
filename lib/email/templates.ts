@@ -71,7 +71,7 @@ export function adminOrderEmail(
   `;
 
   return {
-    subject: `New order #${order.id.slice(0, 8)} — ${formatPaise(order.total)} (${method})`,
+    subject: `New order #${order.id.slice(0, 8)} - ${formatPaise(order.total)} (${method})`,
     html: base("New order", body),
   };
 }
@@ -105,7 +105,7 @@ export function customerOrderEmail(
   `;
 
   return {
-    subject: `Order confirmed — ${STORE_NAME} #${order.id.slice(0, 8)}`,
+    subject: `Order confirmed - ${STORE_NAME} #${order.id.slice(0, 8)}`,
     html: base("Order confirmed", body),
   };
 }
@@ -139,7 +139,7 @@ export function customerStatusEmail(
   `;
 
   return {
-    subject: `Order update — ${newStatus} (#${order.id.slice(0, 8)})`,
+    subject: `Order update - ${newStatus} (#${order.id.slice(0, 8)})`,
     html: base("Order update", body),
   };
 }

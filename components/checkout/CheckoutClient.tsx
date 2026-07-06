@@ -509,7 +509,7 @@ export function CheckoutClient({ shippingPaise }: { shippingPaise: number }) {
                   className="rounded-md border-2 border-ink/10 bg-ink/5 px-4 py-3 text-sm font-medium text-ink/30 shadow-sm cursor-not-allowed"
                   disabled={true}
                 >
-                  Cash on Delivery (COD) — currently unavailable
+                  Cash on Delivery (COD) - currently unavailable
                 </button>
               </div>
             </>

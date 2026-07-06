@@ -125,7 +125,7 @@ export default async function AdminOrderDetail({
               {(addr.city || addr.postal) && (
                 <p className="text-ink/70">
                   {addr.city}
-                  {addr.postal ? ` — ${addr.postal}` : ""}
+                  {addr.postal ? ` - ${addr.postal}` : ""}
                 </p>
               )}
               {addr.phone && (
@@ -181,7 +181,7 @@ export default async function AdminOrderDetail({
           </h2>
           <div className="space-y-1.5 text-sm">
             <p className="font-medium text-ink">
-              {order.profiles?.full_name ?? addr?.name ?? "—"}
+              {order.profiles?.full_name ?? addr?.name ?? "-"}
             </p>
             {order.profiles?.email && (
               <p>

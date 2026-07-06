@@ -124,7 +124,7 @@ export function ImageUploader({
               Click, drop, or paste images here
             </span>
             <span className="mt-1 text-xs text-ink/30">
-              PNG, JPG, WebP up to 5MB each — select multiple at once
+              PNG, JPG, WebP up to 5MB each - select multiple at once
             </span>
           </>
         )}

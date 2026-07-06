@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
   const order = Array.isArray(data) ? data[0] : data;
 
   // Await so serverless fn doesn't exit before email sends.
-  // Errors are caught inside sendOrderEmails — won't fail the order.
+  // Errors are caught inside sendOrderEmails - won't fail the order.
   await sendOrderEmails(
     order as Order,
     user.email ?? "",

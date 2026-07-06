@@ -60,7 +60,7 @@ export async function sendOrderEmails(
 ): Promise<void> {
   const resend = getResend();
   if (!resend) {
-    console.warn("[email] RESEND_API_KEY not set — skipping order emails");
+    console.warn("[email] RESEND_API_KEY not set - skipping order emails");
     return;
   }
 

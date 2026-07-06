@@ -5,7 +5,7 @@ import { sendOrderEmails } from "@/lib/email/notify";
 import type { Order } from "@/types/db";
 
 /**
- * Razorpay webhook — server-to-server source of truth.
+ * Razorpay webhook - server-to-server source of truth.
  *
  * Listens for `payment.captured` (the definitive "money moved" event).
  * Catches edge cases where the client-side verify callback in the browser
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
 
   // ── verify ──────────────────────────────────────────────────────────
   if (!verifyWebhookSignature(raw, signature)) {
-    console.warn("[webhook] bad signature — rejecting");
+    console.warn("[webhook] bad signature - rejecting");
     return NextResponse.json({ error: "bad_signature" }, { status: 400 });
   }
 
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
     .maybeSingle();
 
   if (!order) {
-    // No local order yet — possible if create-order succeeded but
+    // No local order yet - possible if create-order succeeded but
     // create_order_from_cart failed. Log and bounce.
     console.warn(
       "[webhook] no matching order for razorpay_order_id:",
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
   // Razorpay may fire duplicate payment.captured for the same payment.
   // The client-side verify callback may also have already marked it paid.
   if (order.payment_status === "paid") {
-    console.log("[webhook] order already paid — skipping (idempotent)");
+    console.log("[webhook] order already paid - skipping (idempotent)");
     return NextResponse.json({ received: true });
   }
 
@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
   }
 
   console.log(
-    "[webhook] order updated —",
+    "[webhook] order updated -",
     { orderId: order.id, razorpayPaymentId, razorpayOrderId },
   );
 

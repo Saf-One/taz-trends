@@ -76,9 +76,9 @@ export default function NewProductPage() {
             Status
           </span>
           <select name="status" className="input" defaultValue="draft">
-            <option value="draft">Draft — hidden from store</option>
-            <option value="active">Active — visible on store</option>
-            <option value="archived">Archived — not listed</option>
+            <option value="draft">Draft - hidden from store</option>
+            <option value="active">Active - visible on store</option>
+            <option value="archived">Archived - not listed</option>
           </select>
         </label>
 
