@@ -300,7 +300,7 @@ export default async function EditProduct({
                     productId={product.id}
                     storagePath={img.storage_path}
                   />
-                  <div className="absolute inset-0 rounded-lg ring-1 ring-inset ring-ink/10" />
+                  <div className="pointer-events-none absolute inset-0 rounded-lg ring-1 ring-inset ring-ink/10" />
                 </div>
               );
             })}
