@@ -59,7 +59,16 @@ export const metadata: Metadata = {
     canonical: SITE_URL,
   },
   icons: {
-    icon: "/images/favicon/favicon.ico",
+    icon: [
+      {
+        url: "/images/favicon/favicon.svg",
+        type: "image/svg+xml",
+      },
+      {
+        url: "/images/favicon/favicon.ico",
+        sizes: "48x48",
+      },
+    ],
     apple: "/images/favicon/apple-touch-icon.png",
     other: [
       {

@@ -43,6 +43,12 @@ export function websiteSchema() {
     "@type": "WebSite",
     name: STORE_NAME,
     url: BASE_URL,
+    logo: {
+      "@type": "ImageObject",
+      url: `${BASE_URL}/images/brand/brand_logo.jpg`,
+      width: 1080,
+      height: 1080,
+    },
     description:
       "Women's ethnic fashion and outfits. Handpicked quality, traditional craftsmanship with a modern touch.",
     potentialAction: {
