@@ -34,3 +34,25 @@ export async function toggleOffer(offerId: string, isActive: boolean) {
   if (error) throw new Error(error.message);
   revalidatePath("/admin/offers");
 }
+
+/** Validate an offer code from the checkout / cart UI (client components). */
+export async function validateOfferCodeAction(
+  code: string,
+): Promise<{ valid: boolean; offerName?: string }> {
+  const trimmed = code.trim();
+  if (!trimmed) return { valid: false };
+  const supabase = createSupabaseServerClient();
+  const { data } = await supabase
+    .from("offers")
+    .select("name, is_active, starts_at, ends_at")
+    .eq("code", trimmed)
+    .eq("is_active", true)
+    .maybeSingle();
+  if (!data) return { valid: false };
+  const now = Date.now();
+  if (data.starts_at && now < new Date(data.starts_at).getTime())
+    return { valid: false };
+  if (data.ends_at && now > new Date(data.ends_at).getTime())
+    return { valid: false };
+  return { valid: true, offerName: data.name ?? undefined };
+}

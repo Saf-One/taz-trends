@@ -6,6 +6,7 @@ import { useCart } from "@/lib/cart/CartProvider";
 import { useCartProducts } from "@/lib/cart/useCartProducts";
 import { formatPaise, STORE_NAME } from "@/lib/config";
 import { useToast } from "@/lib/notifications/ToastProvider";
+import { validateOfferCodeAction } from "@/lib/offers/actions";
 
 // Razorpay's checkout widget is loaded from their CDN and has no bundled
 // types; typing the global loosely is the standard, justified exception.
@@ -109,8 +110,11 @@ export function CheckoutClient({ shippingPaise }: { shippingPaise: number }) {
   const subtotal = lines.reduce((s, l) => s + unitPaise(l) * l.quantity, 0);
   const total = subtotal + shippingPaise;
 
-  function handleApplyOffer() {
-    if (offerCode.trim().toUpperCase() === "WELCOME10") {
+  async function handleApplyOffer() {
+    const code = offerCode.trim();
+    if (!code) return;
+    const result = await validateOfferCodeAction(code);
+    if (result.valid) {
       setOfferStatus("applied");
     } else {
       setOfferStatus("error");

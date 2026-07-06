@@ -7,6 +7,7 @@ import { useCartProducts } from "@/lib/cart/useCartProducts";
 import { publicImageUrl } from "@/lib/catalog/images";
 import { formatPaise } from "@/lib/config";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { validateOfferCodeAction } from "@/lib/offers/actions";
 
 const FREE_SHIPPING_THRESHOLD_PAISE = 99900; // ₹999
 
@@ -31,12 +32,13 @@ export function CartView() {
     (subtotal / FREE_SHIPPING_THRESHOLD_PAISE) * 100,
   );
 
-  function handleApplyCoupon() {
-    if (couponCode.trim().toUpperCase() === "WELCOME10") {
+  async function handleApplyCoupon() {
+    const result = await validateOfferCodeAction(couponCode);
+    if (result.valid) {
       setCouponApplied(true);
       setCouponError(null);
     } else {
-      setCouponError("Invalid coupon code. Try WELCOME10");
+      setCouponError("Invalid coupon code. Please try again.");
       setCouponApplied(false);
     }
   }
@@ -244,14 +246,14 @@ export function CartView() {
                 <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
                 <polyline points="22 4 12 14.01 9 11.01" />
               </svg>
-              WELCOME10 applied!
+              Coupon applied!
             </p>
           )}
           {couponError && (
             <p className="mt-1.5 text-xs text-red-500">{couponError}</p>
           )}
           <p className="mt-1 text-[10px] text-ink/40">
-            Try code: WELCOME10
+            Enter a valid offer code
           </p>
         </div>
       </aside>
