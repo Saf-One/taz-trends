@@ -179,6 +179,8 @@ select.input {
 }
 .md-body p {
   @apply mb-3 leading-relaxed last:mb-0;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 .md-body ul {
   @apply mb-3 list-disc space-y-1 pl-5;
