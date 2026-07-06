@@ -40,6 +40,8 @@
 
 body {
   @apply bg-white text-ink;
+  max-width: 100vw;
+  overflow-x: hidden;
 }
 
 /* ===== Layout ===== */
@@ -180,6 +182,9 @@ select.input {
   @apply mb-3 leading-relaxed last:mb-0;
   overflow-wrap: break-word;
   word-break: break-word;
+}
+.md-body img {
+  @apply max-w-full h-auto rounded;
 }
 .md-body ul {
   @apply mb-3 list-disc space-y-1 pl-5;
