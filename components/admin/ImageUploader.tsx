@@ -5,6 +5,15 @@ import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { addProductImage } from "@/lib/catalog/actions";
 
+// Allowed MIME types for product images
+const ALLOWED_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/avif",
+]);
+const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
+
 export function ImageUploader({
   productId,
   makePrimary,
@@ -18,17 +27,39 @@ export function ImageUploader({
   const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  /**
+   * Client-side file validation. Server-side validation is not possible
+   * directly in the Supabase storage upload flow, but RLS policies on
+   * the storage bucket should also restrict MIME types.
+   */
+  function validateFile(file: File): string | null {
+    if (!ALLOWED_TYPES.has(file.type)) {
+      return `Invalid file type: ${file.type || "unknown"}. Only JPEG, PNG, WebP, and AVIF are allowed.`;
+    }
+    if (file.size > MAX_SIZE) {
+      return `File too large: ${(file.size / 1024 / 1024).toFixed(1)} MB. Maximum is 5 MB.`;
+    }
+    // Reject SVGs (could contain embedded scripts)
+    if (file.name.toLowerCase().endsWith(".svg")) {
+      return "SVG files are not allowed for security reasons.";
+    }
+    return null;
+  }
+
   async function uploadFile(
     file: File,
     isPrimary: boolean,
   ): Promise<string | null> {
+    const validationError = validateFile(file);
+    if (validationError) return validationError;
+
     const supabase = createSupabaseBrowserClient();
     const safe = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
     const path = `${productId}/${Date.now()}_${safe}`;
 
     const { error: upErr } = await supabase.storage
       .from("product-images")
-      .upload(path, file, { upsert: true });
+      .upload(path, file, { upsert: true, contentType: file.type });
 
     if (upErr) return upErr.message;
 
@@ -124,14 +155,14 @@ export function ImageUploader({
               Click, drop, or paste images here
             </span>
             <span className="mt-1 text-xs text-ink/30">
-              PNG, JPG, WebP up to 5MB each - select multiple at once
+              JPEG, PNG, WebP, AVIF up to 5MB each - select multiple at once
             </span>
           </>
         )}
         <input
           ref={inputRef}
           type="file"
-          accept="image/*"
+          accept="image/jpeg,image/png,image/webp,image/avif"
           multiple
           onChange={onFile}
           disabled={busy}

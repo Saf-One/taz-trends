@@ -3,6 +3,10 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { razorpayClient } from "@/lib/checkout/razorpay";
 import { validateOfferCode } from "@/lib/offers/validate";
 import { SHIPPING_FLAT_PAISE } from "@/lib/config";
+import { rateLimit } from "@/lib/security/rate-limit";
+
+/** 5 create-order attempts per minute per IP */
+const rl = rateLimit({ max: 5, windowMs: 60_000, label: "create-order" });
 
 /**
  * Start the Razorpay path: compute the total server-side, create a Razorpay
@@ -11,6 +15,12 @@ import { SHIPPING_FLAT_PAISE } from "@/lib/config";
  * succeeds (via verify or webhook). Returns what the browser widget needs.
  */
 export async function POST(request: NextRequest) {
+  // ── Rate limit ────────────────────────────────────────────────────
+  const rlResult = rl.check(request);
+  if (!rlResult.allowed) {
+    return NextResponse.json({ error: "too_many_requests" }, { status: 429 });
+  }
+
   const supabase = createSupabaseServerClient();
   const {
     data: { user },

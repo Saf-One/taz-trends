@@ -20,6 +20,18 @@ export async function updateOrderStatus(
 ) {
   const supabase = createSupabaseServerClient();
 
+  // Verify the caller is an admin (RLS is defence-in-depth; check explicitly).
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("not_authenticated");
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("is_admin")
+    .eq("id", user.id)
+    .single();
+  if (!profile?.is_admin) throw new Error("forbidden");
+
   const { data: order, error: readErr } = await supabase
     .from("orders")
     .select("*")
@@ -57,6 +69,19 @@ export async function updateOrderStatus(
 
 export async function updateQuoteStatus(quoteId: string, next: QuoteStatus) {
   const supabase = createSupabaseServerClient();
+
+  // Verify the caller is an admin.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("not_authenticated");
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("is_admin")
+    .eq("id", user.id)
+    .single();
+  if (!profile?.is_admin) throw new Error("forbidden");
+
   const { error } = await supabase
     .from("quotes")
     .update({ status: next })

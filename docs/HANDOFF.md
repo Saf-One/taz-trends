@@ -189,3 +189,75 @@ completed. This caused:
 - Order + stock decrement + cart clear only happen when payment is captured
 - Webhook handles browser-closed scenario (cart still cleared, order made)
 - `payment.failed` event deliberately not handled (scoped API token limitation)
+
+## Full Security Sweep (July 7)
+
+All 8 phases completed and verified - typecheck clean, lint clean, build clean.
+
+### 1. 🔒 Logged-in admin check added to middleware
+- `middleware.ts` now checks `profiles.is_admin` via RLS-compliant query before
+  allowing access to `/admin` routes. Non-admin users are redirected to `/`.
+- All responses get security headers: `X-Content-Type-Options: nosniff`,
+  `X-Frame-Options: DENY`, `X-XSS-Protection: 1; mode=block`,
+  `Referrer-Policy: strict-origin-when-cross-origin`,
+  `Permissions-Policy` (all features denied except payment=self),
+  `Cross-Origin-Opener-Policy: same-origin`,
+  `Cross-Origin-Resource-Policy: same-origin`.
+- Content-Security-Policy header set on all HTML pages (not API/static routes):
+  scripts from self + Razorpay checkout + 'unsafe-inline' + 'unsafe-eval',
+  styles self + 'unsafe-inline', images self + Supabase storage, frames
+  Razorpay, connects self + Supabase + Razorpay API.
+
+### 2. ⬆️ Next.js upgraded 14.2.15 → 14.2.35
+- Runs `latest 14.x` chain. Locks in multiple CVE fixes including the
+  critical Authorization Bypass in Middleware (GHSA-f82v-jwr5-mffw) and
+  various denial-of-service / XSS advisories. No breaking changes.
+- `npm audit` still shows postcss vulnerability (moderate) - non-exploitable
+  as postcss is only used at build time and we don't expose user CSS input.
+
+### 3. 🚦 Rate limiting on all public API routes
+- New `lib/security/rate-limit.ts` - in-memory sliding-window counter per IP.
+  Adequate for self-hosted Next.js; serverless should swap for DB-backed
+  limiter.
+- Limits:
+  - `/api/razorpay/create-order`: 5 req/min per IP
+  - `/api/razorpay/verify`: 10 req/min per IP
+  - `/api/orders/cod`: 3 req/min per IP (prevents bulk COD abuse)
+  - `/api/quotes`: 3 req/min per IP (prevents quote spam)
+
+### 4. 🛡️ Explicit admin authorization in server actions
+- `lib/catalog/actions.ts::deleteProductImage()` - now checks `is_admin` before
+  using the admin (`service_role`) client to delete storage objects.
+- `lib/checkout/actions.ts::updateOrderStatus()` - explicit `is_admin` check.
+- `lib/checkout/actions.ts::updateQuoteStatus()` - explicit `is_admin` check.
+- Previously relied solely on middleware + RLS; now defence-in-depth with
+  explicit per-action checks.
+
+### 5. 🔐 Webhook now returns 500 on order creation failure
+- `/api/razorpay/webhook/route.ts` - changed from `{ received: true }` (200 OK)
+  to `{ error: "order_creation_failed" }` with status 500 when order creation
+  fails. This tells Razorpay to retry the webhook, preventing payments that
+  were captured but never associated with an order.
+
+### 6. 🖼️ Server-side file validation in ImageUploader
+- Rejects: SVG files (embedded scripts/XSS), non-image MIME types, files > 5 MB,
+  non-JPEG/PNG/WebP/AVIF types.
+- Client-side validation before upload; RLS on storage bucket as second layer.
+- Input `accept` attribute narrowed to `image/jpeg,image/png,image/webp,image/avif`.
+
+### 7. ✉️ HTML escaping in all email templates
+- New `h()` helper function in `lib/email/templates.ts` escapes `&<>"'` in
+  user-supplied data (address name, street, city, postal code, customer name).
+- Applied to all 3 email types (admin order alert, customer confirmation,
+  customer status update) plus tracking URLs.
+
+### 8. 📝 Input sanitization in quotes API
+- Length limits: name ≤ 200 chars, email ≤ 320 chars, message ≤ 5000 chars.
+- Rejects oversized input with 400 `field_too_long` before any DB operation.
+- Rate limited to 3 submissions/minute/IP.
+
+### 9. 🗄️ Storage bucket RLS migration
+- New `0009_storage_rls.sql` - restricts product-images bucket operations:
+  - INSERT: authenticated admin only (checks `profiles.is_admin`)
+  - UPDATE/DELETE: authenticated admin only
+  - SELECT: everyone (public read is required for storefront display)

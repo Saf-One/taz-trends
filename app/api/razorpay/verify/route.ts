@@ -5,6 +5,10 @@ import { verifyPaymentSignature } from "@/lib/checkout/razorpay";
 import { sendOrderEmails } from "@/lib/email/notify";
 import type { Order } from "@/types/db";
 import { SHIPPING_FLAT_PAISE } from "@/lib/config";
+import { rateLimit } from "@/lib/security/rate-limit";
+
+/** 10 verify attempts per minute per IP */
+const rl = rateLimit({ max: 10, windowMs: 60_000, label: "verify" });
 
 /**
  * Verify the Razorpay checkout callback. On a valid signature, create the
@@ -12,6 +16,12 @@ import { SHIPPING_FLAT_PAISE } from "@/lib/config";
  * paid, clear the buyer's cart, and send confirmation emails.
  */
 export async function POST(request: NextRequest) {
+  // ── Rate limit ────────────────────────────────────────────────────
+  const rlResult = rl.check(request);
+  if (!rlResult.allowed) {
+    return NextResponse.json({ error: "too_many_requests" }, { status: 429 });
+  }
+
   const supabase = createSupabaseServerClient();
   const {
     data: { user },

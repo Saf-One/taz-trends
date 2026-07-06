@@ -113,7 +113,12 @@ export async function POST(request: NextRequest) {
 
   if (createErr) {
     console.error("[webhook] failed to create order:", createErr.message);
-    return NextResponse.json({ received: true });
+    // Return 500 so Razorpay retries - payment was captured but our order
+    // creation failed; we need this to succeed.
+    return NextResponse.json(
+      { error: "order_creation_failed" },
+      { status: 500 },
+    );
   }
 
   const createdOrder = Array.isArray(orderResult) ? orderResult[0] : orderResult;

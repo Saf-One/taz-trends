@@ -114,8 +114,22 @@ export async function deleteProductImage(
   productId: string,
   storagePath: string,
 ) {
-  // Use admin client to bypass RLS - caller is always an authenticated admin
-  // (admin layout middleware guards these routes).
+  const supabase = createSupabaseServerClient();
+
+  // Verify the caller is an admin before allowing deletion.
+  // Uses the authenticated session (RLS-compliant).
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("not_authenticated");
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("is_admin")
+    .eq("id", user.id)
+    .single();
+  if (!profile?.is_admin) throw new Error("forbidden");
+
+  // Use admin client to bypass RLS for storage + DB deletion.
   const { createSupabaseAdminClient } = await import("@/lib/supabase/admin");
   const admin = createSupabaseAdminClient();
 

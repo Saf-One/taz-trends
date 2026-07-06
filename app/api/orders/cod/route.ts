@@ -3,6 +3,10 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { SHIPPING_FLAT_PAISE } from "@/lib/config";
 import { sendOrderEmails } from "@/lib/email/notify";
 import type { Order } from "@/types/db";
+import { rateLimit } from "@/lib/security/rate-limit";
+
+/** 3 COD orders per minute per IP */
+const rl = rateLimit({ max: 3, windowMs: 60_000, label: "cod-order" });
 
 /**
  * Place a Cash-on-Delivery order. COD is placed IMMEDIATELY at status
@@ -11,6 +15,12 @@ import type { Order } from "@/types/db";
  * Address is stored in order metadata (JSON field).
  */
 export async function POST(request: NextRequest) {
+  // ── Rate limit ────────────────────────────────────────────────────
+  const rlResult = rl.check(request);
+  if (!rlResult.allowed) {
+    return NextResponse.json({ error: "too_many_requests" }, { status: 429 });
+  }
+
   const supabase = createSupabaseServerClient();
   const {
     data: { user },
