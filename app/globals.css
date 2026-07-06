@@ -164,6 +164,13 @@ select.input {
 
 /* ===== Rich-text description ===== */
 
+.md-body {
+  overflow-wrap: break-word;
+  word-break: break-word;
+  max-width: 100%;
+  overflow: hidden;
+}
+
 .md-body h1,
 .md-body h2,
 .md-body h3 {

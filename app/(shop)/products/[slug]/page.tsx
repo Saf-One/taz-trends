@@ -104,7 +104,7 @@ export default async function ProductPage({
       </nav>
 
       <div className="grid gap-8 md:grid-cols-2">
-        <div>
+        <div className="min-w-0">
           {images.length > 0 ? (
             <div className="card overflow-hidden p-2">
               <ImageCarousel images={images} showThumbnails />
@@ -116,7 +116,7 @@ export default async function ProductPage({
           )}
         </div>
 
-        <div id="add-to-cart">
+        <div id="add-to-cart" className="min-w-0">
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0 flex-1">
               <h1 className="font-serif text-3xl text-ink">{product.title}</h1>
