@@ -108,6 +108,26 @@ export async function deleteVariant(productId: string, variantId: string) {
   revalidatePath(`/admin/products/${productId}/edit`);
 }
 
+/** Delete a product image from both DB and storage. */
+export async function deleteProductImage(
+  imageId: string,
+  productId: string,
+  storagePath: string,
+) {
+  const supabase = createSupabaseServerClient();
+
+  // Remove from storage (best-effort — row delete is the main concern)
+  await supabase.storage.from("product-images").remove([storagePath]);
+
+  const { error } = await supabase
+    .from("product_images")
+    .delete()
+    .eq("id", imageId);
+
+  if (error) throw new Error(error.message);
+  revalidatePath(`/admin/products/${productId}/edit`);
+}
+
 /** Record an uploaded image (file already in storage via the browser). */
 export async function addProductImage(
   productId: string,

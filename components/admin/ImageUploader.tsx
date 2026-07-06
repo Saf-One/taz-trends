@@ -18,11 +18,10 @@ export function ImageUploader({
   const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  async function uploadFile(file: File) {
-    if (!file) return;
-    setBusy(true);
-    setError(null);
-
+  async function uploadFile(
+    file: File,
+    isPrimary: boolean,
+  ): Promise<string | null> {
     const supabase = createSupabaseBrowserClient();
     const safe = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
     const path = `${productId}/${Date.now()}_${safe}`;
@@ -31,27 +30,40 @@ export function ImageUploader({
       .from("product-images")
       .upload(path, file, { upsert: true });
 
-    if (upErr) {
-      setBusy(false);
-      setError(upErr.message);
-      return;
+    if (upErr) return upErr.message;
+
+    await addProductImage(productId, path, isPrimary);
+    router.refresh();
+    return null;
+  }
+
+  async function uploadFiles(files: FileList | File[]) {
+    const list = Array.from(files);
+    if (list.length === 0) return;
+
+    setBusy(true);
+    setError(null);
+
+    let firstErr: string | null = null;
+    for (let i = 0; i < list.length; i++) {
+      const msg = await uploadFile(list[i], makePrimary && i === 0);
+      if (msg && !firstErr) firstErr = msg;
     }
 
-    await addProductImage(productId, path, makePrimary);
     setBusy(false);
-    router.refresh();
+    if (firstErr) setError(firstErr);
   }
 
   async function onFile(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    await uploadFile(file!);
+    if (e.target.files) await uploadFiles(e.target.files);
+    // Reset so re-selecting the same files re-fires onChange
+    e.target.value = "";
   }
 
   function onDrop(e: React.DragEvent) {
     e.preventDefault();
     setDragOver(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file) uploadFile(file);
+    if (e.dataTransfer.files) uploadFiles(e.dataTransfer.files);
   }
 
   return (
@@ -109,10 +121,10 @@ export function ImageUploader({
               <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
             </svg>
             <span className="text-sm text-ink/50">
-              Click or drop an image here
+              Click, drop, or paste images here
             </span>
             <span className="mt-1 text-xs text-ink/30">
-              PNG, JPG, WebP up to 5MB
+              PNG, JPG, WebP up to 5MB each — select multiple at once
             </span>
           </>
         )}
@@ -120,6 +132,7 @@ export function ImageUploader({
           ref={inputRef}
           type="file"
           accept="image/*"
+          multiple
           onChange={onFile}
           disabled={busy}
           className="hidden"
