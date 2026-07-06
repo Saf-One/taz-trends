@@ -24,7 +24,7 @@ export default async function HomePage({
     <div>
       {/* Hero Banner */}
       <section className="relative -mx-4 -mt-8 mb-10 overflow-hidden sm:-mx-4 md:-mx-4 lg:-mx-4">
-        <div className="relative flex min-h-[320px] items-center justify-center bg-gradient-to-br from-wine via-wine/80 to-blush/60 sm:min-h-[400px]">
+        <div className="relative flex min-h-[320px] items-center justify-center bg-gradient-to-br from-wine via-wine/90 to-blush/35 sm:min-h-[400px]">
           {/* Background watermark */}
           <div
             className="pointer-events-none absolute inset-0 opacity-[0.07]"
