@@ -53,8 +53,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="overflow-x-hidden">
-      <body className="min-h-screen antialiased overflow-x-hidden">
+    <html lang="en">
+      <body className="min-h-screen antialiased">
         <ToastProvider>{children}</ToastProvider>
       </body>
     </html>

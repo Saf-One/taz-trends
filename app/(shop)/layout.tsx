@@ -12,7 +12,7 @@ export default async function ShopLayout({
 
   return (
     <CartProvider>
-      <div className="flex min-h-screen flex-col w-full overflow-x-hidden">
+      <div className="flex min-h-screen flex-col w-full">
         <div className="bg-logo-bg">
           <Header
             userEmail={profile?.email ?? null}
@@ -20,7 +20,7 @@ export default async function ShopLayout({
           />
         </div>
         <div
-          className="container-page flex-1 py-8 bg-flower-logo"
+          className="container-page flex-1 py-8 bg-flower-logo min-w-0 overflow-x-hidden"
           style={{
             backgroundImage:
               'linear-gradient(rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0.65)), url(/images/body/logo_flower.png)',
