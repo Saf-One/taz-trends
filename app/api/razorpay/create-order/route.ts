@@ -6,8 +6,9 @@ import { SHIPPING_FLAT_PAISE } from "@/lib/config";
 
 /**
  * Start the Razorpay path: compute the total server-side, create a Razorpay
- * order (optionally with an offer), and persist a local `orders` row at
- * status pending. Returns what the browser widget needs.
+ * order (optionally with an offer), and store checkout context temporarily.
+ * Does NOT create a local order yet - the order is only created when payment
+ * succeeds (via verify or webhook). Returns what the browser widget needs.
  */
 export async function POST(request: NextRequest) {
   const supabase = createSupabaseServerClient();
@@ -56,28 +57,21 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: msg }, { status: 502 });
   }
 
-  // Persist the local order (recomputes subtotal server-side to match).
-  const { data: created, error: orderErr } = await supabase.rpc(
-    "create_order_from_cart",
-    {
-      p_payment_method: "razorpay",
-      p_shipping_paise: SHIPPING_FLAT_PAISE,
-      p_offer_id: offer?.id ?? null,
-      p_razorpay_order_id: rzpOrder.id,
-      // Object as-is: stringifying stores a JSON string scalar, not an object.
-      p_address_json: address,
-    },
-  );
-  if (orderErr) {
-    return NextResponse.json({ error: orderErr.message }, { status: 400 });
-  }
-  const order = Array.isArray(created) ? created[0] : created;
+  // Store checkout context temporarily - will be used when payment succeeds.
+  // This prevents orphan orders if user cancels/closes browser.
+  await supabase.from("pending_checkouts").upsert({
+    user_id: user.id,
+    razorpay_order_id: rzpOrder.id,
+    address_json: address,
+    offer_id: offer?.id ?? null,
+  });
 
+  // Return Razorpay order data - the local order will be created
+  // in verify or webhook when payment succeeds.
   return NextResponse.json({
     keyId: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
     razorpayOrderId: rzpOrder.id,
     amount: total,
     currency: "INR",
-    orderId: order.id,
   });
 }

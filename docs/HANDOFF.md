@@ -150,3 +150,42 @@ and implemented. None is destructive.
 Both are configured via `.env.example` placeholders; the app builds and
 boots without them, but the live payment/auth round-trip needs real
 credentials the owner must supply.
+
+## Changes to Razorpay Order Flow (July 6)
+
+### The Bug
+Previously, `/api/razorpay/create-order` immediately created a local order
+(with `status='pending'`, `payment_status='pending'`) before payment was
+completed. This caused:
+- Orders appearing in admin when users cancelled/abandoned Razorpay payments
+- Stock being decremented before payment was confirmed
+- No way for admin to distinguish abandoned payments from legitimate ones
+
+### The Fix
+1. **`pending_checkouts` table** (migration 0007) - temporarily stores
+   checkout context (address, offer) keyed by `(user_id, razorpay_order_id)`.
+   Created in `create-order`, consumed by verify/webhook, cleaned up after
+   processing. RLS restricts to owner; stale records cleaned up after 24h.
+
+2. **`create_order_from_cart_admin` RPC** (migration 0008) - same as
+   `create_order_from_cart` but accepts `user_id` explicitly (needed because
+   the webhook runs without a user session) and sets `processing`/`paid`
+   directly since it's only called after payment capture.
+
+3. **`/api/razorpay/create-order`** now only creates the Razorpay order and
+   stores checkout context - no local order is created.
+
+4. **`/api/razorpay/verify`** creates the order on successful payment
+   verification (retrieving address/offer from pending_checkouts), marks it
+   paid/processing, clears cart, sends email.
+
+5. **`/api/razorpay/webhook`** creates the order on `payment.captured`
+   (handles browser-closed case where verify never ran), clears cart, sends
+   email. Also cleans up pending_checkouts and clears cart on duplicate
+   events (idempotent).
+
+### Result
+- No order created if user cancels/closes browser without paying
+- Order + stock decrement + cart clear only happen when payment is captured
+- Webhook handles browser-closed scenario (cart still cleared, order made)
+- `payment.failed` event deliberately not handled (scoped API token limitation)

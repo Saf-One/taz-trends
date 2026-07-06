@@ -100,22 +100,8 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    name: STORE_NAME,
-    url: SITE_URL,
-    logo: `${SITE_URL}/images/brand/brand_logo.jpg`,
-  };
-
   return (
     <html lang="en">
-      <head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
-      </head>
       <body className="min-h-screen antialiased">
         {/* Preconnect to image origin */}
         <link rel="preconnect" href={process.env.NEXT_PUBLIC_SUPABASE_URL || ""} />

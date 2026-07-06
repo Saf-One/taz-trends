@@ -3,16 +3,14 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { verifyWebhookSignature } from "@/lib/checkout/razorpay";
 import { sendOrderEmails } from "@/lib/email/notify";
 import type { Order } from "@/types/db";
+import { SHIPPING_FLAT_PAISE } from "@/lib/config";
 
 /**
  * Razorpay webhook - server-to-server source of truth.
  *
  * Listens for `payment.captured` (the definitive "money moved" event).
- * Catches edge cases where the client-side verify callback in the browser
- * failed or was never called (user closed the tab, network drop, etc.).
- *
- * Idempotent, fully logged, and always returns 200 ASAP so Razorpay
- * does not retry a handled event.
+ * On successful payment, creates the local order from cart (if not already done
+ * by the verify endpoint) and clears the buyer's cart.
  */
 export async function POST(request: NextRequest) {
   const raw = await request.text();
@@ -44,6 +42,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ received: true });
   }
 
+  const admin = createSupabaseAdminClient();
   const razorpayPaymentId = event.payload?.payment?.entity?.id;
   const razorpayOrderId = event.payload?.payment?.entity?.order_id;
 
@@ -52,68 +51,101 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "missing_payment_data" }, { status: 400 });
   }
 
-  // ── find order ──────────────────────────────────────────────────────
-  const admin = createSupabaseAdminClient();
-
-  const { data: order } = await admin
-    .from("orders")
-    .select("id, payment_status, user_id")
+  // ── find pending checkout (contains user_id, address, offer) ----------
+  const { data: pending } = await admin
+    .from("pending_checkouts")
+    .select("user_id, address_json, offer_id")
     .eq("razorpay_order_id", razorpayOrderId)
     .maybeSingle();
 
-  if (!order) {
-    // No local order yet - possible if create-order succeeded but
-    // create_order_from_cart failed. Log and bounce.
+  if (!pending) {
     console.warn(
-      "[webhook] no matching order for razorpay_order_id:",
+      "[webhook] no pending checkout for razorpay_order_id:",
       razorpayOrderId,
     );
     return NextResponse.json({ received: true });
   }
 
+  const userId = pending.user_id;
+
+  // ── check if order already exists ------------------------------------
+  // (verify endpoint may have already created it)
+  const { data: order } = await admin
+    .from("orders")
+    .select("id, payment_status, user_id")
+    .eq("razorpay_order_id", razorpayOrderId)
+    .eq("user_id", userId)
+    .maybeSingle();
+
   // ── idempotency ─────────────────────────────────────────────────────
   // Razorpay may fire duplicate payment.captured for the same payment.
-  // The client-side verify callback may also have already marked it paid.
-  if (order.payment_status === "paid") {
+  if (order && order.payment_status === "paid") {
+    // Still ensure cart is cleared (defensive)
+    const { data: cart } = await admin
+      .from("carts")
+      .select("id")
+      .eq("user_id", userId)
+      .maybeSingle();
+    if (cart) {
+      await admin.from("cart_items").delete().eq("cart_id", cart.id);
+    }
+    await admin
+      .from("pending_checkouts")
+      .delete()
+      .eq("razorpay_order_id", razorpayOrderId);
     console.log("[webhook] order already paid - skipping (idempotent)");
     return NextResponse.json({ received: true });
   }
 
-  // ── persist the captured payment ────────────────────────────────────
-  const { error: updateErr } = await admin
-    .from("orders")
-    .update({
-      payment_status: "paid",
-      status: "processing",
-      razorpay_payment_id: razorpayPaymentId,
-    })
-    .eq("id", order.id);
-
-  if (updateErr) {
-    console.error("[webhook] failed to update order:", updateErr.message);
-    return NextResponse.json({ error: "update_failed" }, { status: 500 });
-  }
-
-  console.log(
-    "[webhook] order updated -",
-    { orderId: order.id, razorpayPaymentId, razorpayOrderId },
+  // ── create order from cart -----------------------------------------
+  const { data: orderResult, error: createErr } = await admin.rpc(
+    "create_order_from_cart_admin",
+    {
+      p_user_id: userId,
+      p_payment_method: "razorpay",
+      p_shipping_paise: SHIPPING_FLAT_PAISE,
+      p_offer_id: pending.offer_id ?? null,
+      p_razorpay_order_id: razorpayOrderId,
+      p_address_json: pending.address_json ?? {},
+      p_razorpay_payment_id: razorpayPaymentId,
+    },
   );
 
-  // ── send confirmation emails (fire-and-forget) ──────────────────────
-  // The client-side verify callback normally sends these, but if the
-  // browser callback never ran (closed tab, network failure) the webhook
-  // acts as the safety net. Fetch the full order + user email to send.
+  if (createErr) {
+    console.error("[webhook] failed to create order:", createErr.message);
+    return NextResponse.json({ received: true });
+  }
+
+  const createdOrder = Array.isArray(orderResult) ? orderResult[0] : orderResult;
+
+  // ── clear cart ------------------------------------------------------
+  const { data: cart } = await admin
+    .from("carts")
+    .select("id")
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (cart) {
+    await admin.from("cart_items").delete().eq("cart_id", cart.id);
+  }
+
+  // Clean up pending checkout
+  await admin
+    .from("pending_checkouts")
+    .delete()
+    .eq("razorpay_order_id", razorpayOrderId);
+
+  // ── send confirmation emails ----------------------------------------
   const { data: fullOrder } = await admin
     .from("orders")
     .select("*")
-    .eq("id", order.id)
+    .eq("id", createdOrder.id)
     .maybeSingle();
 
   if (fullOrder) {
     const { data: profile } = await admin
       .from("profiles")
       .select("email, full_name")
-      .eq("id", order.user_id)
+      .eq("id", userId)
       .maybeSingle();
 
     if (profile?.email) {
@@ -121,15 +153,10 @@ export async function POST(request: NextRequest) {
         fullOrder as Order,
         profile.email,
         profile.full_name,
-      ).catch((e) =>
-        console.error("[webhook] sendOrderEmails failed:", e),
-      );
-    } else {
-      console.warn("[webhook] no profile/email for user:", order.user_id);
+      ).catch((e) => console.error("[webhook] sendOrderEmails failed:", e));
     }
-  } else {
-    console.warn("[webhook] could not re-fetch order after update");
   }
 
+  console.log("[webhook] order created:", createdOrder.id);
   return NextResponse.json({ received: true });
 }

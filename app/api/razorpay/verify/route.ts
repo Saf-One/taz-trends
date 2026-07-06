@@ -4,12 +4,12 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { verifyPaymentSignature } from "@/lib/checkout/razorpay";
 import { sendOrderEmails } from "@/lib/email/notify";
 import type { Order } from "@/types/db";
+import { SHIPPING_FLAT_PAISE } from "@/lib/config";
 
 /**
- * Verify the Razorpay checkout callback. On a valid signature, mark the
- * order paid + processing and clear the buyer's cart. Uses the service role
- * (a normal user cannot update order status under RLS) but only after the
- * signature check and scoped to that user's own order.
+ * Verify the Razorpay checkout callback. On a valid signature, create the
+ * local order from the cart (using stored pending_checkout context), mark it
+ * paid, clear the buyer's cart, and send confirmation emails.
  */
 export async function POST(request: NextRequest) {
   const supabase = createSupabaseServerClient();
@@ -26,57 +26,95 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "missing_fields" }, { status: 400 });
   }
 
-  const ok = verifyPaymentSignature({
+  if (!verifyPaymentSignature({
     razorpay_order_id,
     razorpay_payment_id,
     razorpay_signature,
-  });
-  if (!ok) {
+  })) {
     return NextResponse.json({ error: "bad_signature" }, { status: 400 });
   }
 
   const admin = createSupabaseAdminClient();
 
-  // Scope strictly to this user's pending order for that Razorpay order id.
-  const { data: order } = await admin
+  // Fetch stored checkout context
+  const { data: pending } = await admin
+    .from("pending_checkouts")
+    .select("address_json, offer_id")
+    .eq("user_id", user.id)
+    .eq("razorpay_order_id", razorpay_order_id)
+    .maybeSingle();
+
+  // Check if order already exists (webhook may have already created it)
+  const { data: existingOrder } = await admin
     .from("orders")
     .select("id, user_id, payment_status")
     .eq("razorpay_order_id", razorpay_order_id)
     .eq("user_id", user.id)
     .maybeSingle();
 
-  if (!order) {
-    return NextResponse.json({ error: "order_not_found" }, { status: 404 });
-  }
-
-  if (order.payment_status !== "paid") {
-    await admin
-      .from("orders")
-      .update({ payment_status: "paid", status: "processing" })
-      .eq("id", order.id);
-
-    // Clear the buyer's cart now that payment is confirmed.
+  // Idempotency: if webhook already processed this payment
+  if (existingOrder?.payment_status === "paid") {
+    // Still need to clear cart if somehow not cleared
     const { data: cart } = await admin
       .from("carts")
       .select("id")
       .eq("user_id", user.id)
       .maybeSingle();
-    if (cart) await admin.from("cart_items").delete().eq("cart_id", cart.id);
-
-    // Fetch updated order for email (needs paid status)
-    const { data: updatedOrder } = await admin
-      .from("orders")
-      .select("*")
-      .eq("id", order.id)
-      .maybeSingle();
-
-    if (updatedOrder) {
-      await sendOrderEmails(
-        updatedOrder as Order,
-        user.email ?? "",
-        user.user_metadata?.full_name ?? null,
-      );
+    if (cart) {
+      await admin.from("cart_items").delete().eq("cart_id", cart.id);
     }
+    // Clean up pending checkout (defensive)
+    await admin.from("pending_checkouts").delete().eq("razorpay_order_id", razorpay_order_id);
+    return NextResponse.json({ ok: true, orderId: existingOrder.id });
+  }
+
+  // Create order from cart now that payment succeeded
+  const { data: orderResult, error: orderErr } = await admin.rpc(
+    "create_order_from_cart_admin",
+    {
+      p_user_id: user.id,
+      p_payment_method: "razorpay",
+      p_shipping_paise: SHIPPING_FLAT_PAISE,
+      p_offer_id: pending?.offer_id ?? null,
+      p_razorpay_order_id: razorpay_order_id,
+      p_address_json: pending?.address_json ?? {},
+      p_razorpay_payment_id: razorpay_payment_id,
+    },
+  );
+
+  if (orderErr) {
+    // Cart may be empty or other error - but payment succeeded
+    return NextResponse.json({ error: orderErr.message }, { status: 400 });
+  }
+
+  const order = Array.isArray(orderResult) ? orderResult[0] : orderResult;
+
+  // Clear the buyer's cart now that payment is confirmed
+  const { data: cart } = await admin
+    .from("carts")
+    .select("id")
+    .eq("user_id", user.id)
+    .maybeSingle();
+  if (cart) {
+    await admin.from("cart_items").delete().eq("cart_id", cart.id);
+  }
+
+  // Clean up pending checkout
+  await admin.from("pending_checkouts").delete().eq("razorpay_order_id", razorpay_order_id);
+
+  // Fetch updated order for email
+  const { data: fullOrder } = await admin
+    .from("orders")
+    .select("*")
+    .eq("id", order.id)
+    .maybeSingle();
+
+  if (fullOrder) {
+    await sendOrderEmails(
+      fullOrder as Order,
+      user.email ?? "",
+      user.user_metadata?.full_name ?? null,
+    );
   }
 
   return NextResponse.json({ ok: true, orderId: order.id });

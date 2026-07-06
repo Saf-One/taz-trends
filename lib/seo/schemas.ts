@@ -14,7 +14,12 @@ export function organizationSchema() {
     "@type": "Organization",
     name: STORE_NAME,
     url: BASE_URL,
-    logo: `${BASE_URL}/images/brand/brand_logo.jpg`,
+    logo: {
+      "@type": "ImageObject",
+      url: `${BASE_URL}/images/brand/brand_logo.jpg`,
+      width: 512,
+      height: 512,
+    },
     description:
       "Women's ethnic fashion and outfits. Handpicked quality, traditional craftsmanship with a modern touch.",
     sameAs: [
