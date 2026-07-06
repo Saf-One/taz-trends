@@ -12,7 +12,7 @@ export default async function ShopLayout({
 
   return (
     <CartProvider>
-      <div className="flex min-h-screen flex-col">
+      <div className="flex min-h-screen flex-col w-full overflow-x-hidden">
         <div className="bg-logo-bg">
           <Header
             userEmail={profile?.email ?? null}

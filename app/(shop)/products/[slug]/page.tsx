@@ -95,7 +95,7 @@ export default async function ProductPage({
       <DetailClient product={product} />
 
       {/* Breadcrumbs */}
-      <nav className="mb-4 flex items-center gap-1 text-xs text-ink/40">
+      <nav className="mb-4 flex flex-wrap items-center gap-1 text-xs text-ink/40">
         <a href="/" className="hover:text-wine">Home</a>
         <span>/</span>
         <span className="text-ink/60">Products</span>
