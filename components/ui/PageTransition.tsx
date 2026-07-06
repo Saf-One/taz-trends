@@ -20,8 +20,8 @@ export function PageTransition({
   return (
     <div
       className={cn(
-        "transition-all duration-300",
-        mounted ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0",
+        "transition-opacity duration-200",
+        mounted ? "opacity-100" : "opacity-0",
         className,
       )}
     >
