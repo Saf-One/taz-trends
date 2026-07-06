@@ -5,11 +5,8 @@ import Link from "next/link";
 import type { ProductWithRelations } from "@/types/db";
 import { useCart } from "@/lib/cart/CartProvider";
 import { formatPaise } from "@/lib/config";
-import { useToast } from "@/lib/notifications/ToastProvider";
-
 export function AddToCartForm({ product }: { product: ProductWithRelations }) {
   const { add, lines, setQty, remove } = useCart();
-  const { toast } = useToast();
   const variants = product.product_variants ?? [];
   const hasVariants = variants.length > 0;
 
@@ -37,7 +34,6 @@ export function AddToCartForm({ product }: { product: ProductWithRelations }) {
   async function onAdd() {
     setBusy(true);
     await add(product.id, hasVariants ? variantId : null, 1);
-    toast("Added to cart!", "success");
     setBusy(false);
   }
 
