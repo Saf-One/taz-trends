@@ -46,6 +46,79 @@ export function ImageUploader({
     return null;
   }
 
+  /**
+   * Compress an image client-side before upload.
+   * - Resizes to max 1920px on the longest side (preserves aspect ratio)
+   * - Converts to WebP at quality 82
+   * - Falls back to original file on any error (silent degradation)
+   * Returns the compressed blob and the new MIME type.
+   */
+  async function compressImage(
+    file: File,
+  ): Promise<{ blob: Blob; mime: string }> {
+    // Skip compression for already-small WebP/AVIF files
+    if (
+      (file.type === "image/webp" || file.type === "image/avif") &&
+      file.size < 300 * 1024
+    ) {
+      return { blob: file, mime: file.type };
+    }
+
+    try {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => resolve();
+        img.onerror = () => reject(new Error("failed to decode"));
+        img.src = url;
+      });
+      URL.revokeObjectURL(url);
+
+      let { width, height } = img;
+      const MAX_DIM = 1920;
+
+      // If already small and in a modern format, skip processing
+      if (
+        width <= MAX_DIM &&
+        height <= MAX_DIM &&
+        (file.type === "image/webp" || file.type === "image/avif")
+      ) {
+        return { blob: file, mime: file.type };
+      }
+
+      // Resize if needed
+      if (width > MAX_DIM || height > MAX_DIM) {
+        const ratio = Math.min(MAX_DIM / width, MAX_DIM / height);
+        width = Math.round(width * ratio);
+        height = Math.round(height * ratio);
+      }
+
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d")!;
+
+      // Fill white background so PNG transparency doesn't become black
+      ctx.fillStyle = "#FFFFFF";
+      ctx.fillRect(0, 0, width, height);
+      ctx.drawImage(img, 0, 0, width, height);
+
+      const blob = await new Promise<Blob | null>((resolve) =>
+        canvas.toBlob(resolve, "image/webp", 0.82),
+      );
+
+      if (blob && blob.size < file.size) {
+        return { blob, mime: "image/webp" };
+      }
+
+      // Compressed version is larger somehow — keep original
+      return { blob: file, mime: file.type };
+    } catch {
+      // Silent fallback to original on any error
+      return { blob: file, mime: file.type };
+    }
+  }
+
   async function uploadFile(
     file: File,
     isPrimary: boolean,
@@ -53,13 +126,17 @@ export function ImageUploader({
     const validationError = validateFile(file);
     if (validationError) return validationError;
 
+    // Compress before upload (transparent to admin)
+    const { blob, mime } = await compressImage(file);
+
     const supabase = createSupabaseBrowserClient();
-    const safe = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-    const path = `${productId}/${Date.now()}_${safe}`;
+    const ext = mime === "image/webp" ? "webp" : file.name.split(".").pop() ?? "jpg";
+    const safe = file.name.replace(/[^a-zA-Z0-9._-]/g, "_").replace(/\.[^.]+$/, "");
+    const path = `${productId}/${Date.now()}_${safe}.${ext}`;
 
     const { error: upErr } = await supabase.storage
       .from("product-images")
-      .upload(path, file, { upsert: true, contentType: file.type });
+      .upload(path, blob, { upsert: true, contentType: mime });
 
     if (upErr) return upErr.message;
 
