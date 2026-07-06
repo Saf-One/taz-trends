@@ -67,7 +67,7 @@ export function ProductCard({ product }: { product: ProductWithRelations }) {
         className="block"
       >
         {/* Image area */}
-        <div className="relative overflow-hidden">
+        <div className="relative overflow-hidden [box-shadow:inset_0_0_0_1px_rgba(0,0,0,0.06)]">
           {images.length > 0 ? (
             <div className="transition-transform duration-300 group-hover:scale-105">
               <ImageCarousel images={images} />
@@ -183,50 +183,47 @@ export function ProductCard({ product }: { product: ProductWithRelations }) {
       {/* Details */}
       <div className="p-3">
         <Link href={`/products/${product.slug}`}>
-          <h3 className="line-clamp-2 font-serif text-sm text-ink group-hover:text-wine transition-colors">
+          <h3 className="line-clamp-2 text-balance font-serif text-sm leading-snug text-ink transition-colors group-hover:text-wine">
             {product.title}
           </h3>
         </Link>
-        <div className="mt-1 flex items-center gap-2">
-          <p className="text-sm text-wine">
-            {hasVariants(product) ? "From " : ""}
-            {formatPaise(price)}
-          </p>
-          {discountPct && (
-            <p className="text-xs text-ink/40 line-through">
-              {formatPaise(compareAt!)}
+        <div className="mt-1.5 flex items-center gap-3">
+          <div className="flex flex-1 flex-wrap items-baseline gap-x-1.5">
+            <p className="text-sm font-medium text-wine tabular-nums">
+              {hasVariants(product) && (
+                <span className="text-[10px] font-normal text-ink/40">From </span>
+              )}
+              {formatPaise(price)}
             </p>
-          )}
-        </div>
-        {/* Buy now link */}
-        {!soldOut && (
-          <div className="mt-2 flex items-center justify-between">
-            {!hasVariant ? (
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  buyNow(null);
-                }}
-                disabled={busy !== null}
-                className="text-xs font-medium text-wine/70 hover:text-wine disabled:opacity-50"
-              >
-                {busy === "buy" ? "Redirecting…" : "Buy now"}
-              </button>
-            ) : (
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setShowVariants(showVariants === "buy" ? null : "buy");
-                }}
-                className="text-xs font-medium text-wine/70 hover:text-wine"
-              >
-                Buy now
-              </button>
+            {discountPct && (
+              <>
+                <p className="text-xs text-ink/30 line-through tabular-nums">
+                  {formatPaise(compareAt!)}
+                </p>
+                <span className="rounded bg-green-50 px-1.5 py-0.5 text-[10px] font-medium leading-none text-green-600">
+                  {discountPct}% off
+                </span>
+              </>
             )}
           </div>
-        )}
+          {!soldOut && !hasVariant && (
+            <button
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); buyNow(null); }}
+              disabled={busy !== null}
+              className="shrink-0 rounded-md border border-wine/20 px-3 py-1.5 text-[11px] font-medium text-wine transition-all hover:bg-wine hover:text-white active:scale-[0.97] disabled:opacity-50"
+            >
+              {busy === "buy" ? "Redirecting…" : "Buy now"}
+            </button>
+          )}
+          {!soldOut && hasVariant && (
+            <button
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowVariants(showVariants === "buy" ? null : "buy"); }}
+              className="shrink-0 rounded-md border border-wine/20 px-3 py-1.5 text-[11px] font-medium text-wine transition-all hover:bg-wine hover:text-white active:scale-[0.97]"
+            >
+              Buy now
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Variant popover for Buy now */}
