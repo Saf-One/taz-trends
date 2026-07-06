@@ -200,7 +200,7 @@ select.input {
   @apply mb-3 list-decimal space-y-1 pl-5;
 }
 .md-body strong {
-  @apply font-semibold text-ink;
+  @apply font-bold text-ink;
 }
 .md-body em {
   @apply italic;

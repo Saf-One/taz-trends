@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import ReactMarkdown from "react-markdown";
 import { getActiveProducts, getProductBySlug } from "@/lib/catalog/queries";
 import { carouselImages, publicImageUrl } from "@/lib/catalog/images";
 import { AddToCartForm } from "@/components/product/AddToCartForm";
@@ -8,6 +7,7 @@ import { ImageCarousel } from "@/components/product/ImageCarousel";
 import { RecentlyViewed } from "@/components/product/RecentlyViewed";
 import { DetailClient } from "./DetailClient";
 import { ShareButton } from "./ShareButton";
+import { Markdown } from "@/components/ui/Markdown";
 import type { ProductWithRelations } from "@/types/db";
 import { formatPaise } from "@/lib/config";
 import { displayPricePaise, hasVariants } from "@/lib/catalog/queries";
@@ -131,7 +131,7 @@ export default async function ProductPage({
 
           {product.description && (
             <div className="md-body mt-3 text-ink/70">
-              <ReactMarkdown>{product.description}</ReactMarkdown>
+              <Markdown>{product.description}</Markdown>
             </div>
           )}
           <div className="mt-6">
