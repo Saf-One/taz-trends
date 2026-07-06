@@ -114,12 +114,14 @@ export async function deleteProductImage(
   productId: string,
   storagePath: string,
 ) {
-  const supabase = createSupabaseServerClient();
+  // Use admin client to bypass RLS — caller is always an authenticated admin
+  // (admin layout middleware guards these routes).
+  const { createSupabaseAdminClient } = await import("@/lib/supabase/admin");
+  const admin = createSupabaseAdminClient();
 
-  // Remove from storage (best-effort — row delete is the main concern)
-  await supabase.storage.from("product-images").remove([storagePath]);
+  await admin.storage.from("product-images").remove([storagePath]);
 
-  const { error } = await supabase
+  const { error } = await admin
     .from("product_images")
     .delete()
     .eq("id", imageId);
