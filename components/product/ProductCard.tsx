@@ -22,8 +22,7 @@ export function ProductCard({ product }: { product: ProductWithRelations }) {
   const soldOut = totalStock(product) <= 0;
   const hasVariant = hasVariants(product);
   const variants = product.product_variants ?? [];
-
-  const [showVariants, setShowVariants] = useState(false);
+  const [showVariants, setShowVariants] = useState<"add" | "buy" | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
 
   // Discount percentage badge
@@ -37,14 +36,14 @@ export function ProductCard({ product }: { product: ProductWithRelations }) {
     setBusy("add");
     await add(product.id, variantId, 1);
     setBusy(null);
-    setShowVariants(false);
+    setShowVariants(null);
   }
 
   async function buyNow(variantId: string | null) {
     setBusy("buy");
     await add(product.id, variantId, 1);
     setBusy(null);
-    setShowVariants(false);
+    setShowVariants(null);
     router.push("/checkout");
   }
 
@@ -140,14 +139,14 @@ export function ProductCard({ product }: { product: ProductWithRelations }) {
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      setShowVariants(!showVariants);
+                      setShowVariants(showVariants === "add" ? null : "add");
                     }}
                     disabled={busy !== null}
                     className="w-full rounded-md bg-wine py-2 text-xs font-medium text-white shadow-sm transition-colors hover:bg-wine/90"
                   >
                     {busy === "add" ? "Adding…" : "Add to cart"}
                   </button>
-                  {showVariants && (
+                  {showVariants === "add" && (
                     <div
                       className="absolute bottom-full left-0 right-0 z-30 mb-2 rounded-lg border border-ink/10 bg-white p-3 shadow-lg"
                       onClick={(e) => e.stopPropagation()}
@@ -219,7 +218,7 @@ export function ProductCard({ product }: { product: ProductWithRelations }) {
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  setShowVariants(!showVariants);
+                  setShowVariants(showVariants === "buy" ? null : "buy");
                 }}
                 className="text-xs font-medium text-wine/70 hover:text-wine"
               >
@@ -231,10 +230,10 @@ export function ProductCard({ product }: { product: ProductWithRelations }) {
       </div>
 
       {/* Variant popover for Buy now */}
-      {hasVariant && showVariants && (
+      {hasVariant && showVariants === "buy" && (
         <div
           className="fixed inset-0 z-40"
-          onClick={() => setShowVariants(false)}
+          onClick={() => setShowVariants(null)}
         >
           <div
             className="absolute bottom-full left-3 right-3 z-50 mb-2 rounded-lg border border-ink/10 bg-white p-3 shadow-lg"
