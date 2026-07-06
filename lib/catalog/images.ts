@@ -11,13 +11,29 @@ export function publicImageUrl(storagePath: string | null | undefined): string |
 }
 
 /**
+ * Strip markdown formatting, emoji, and special chars from alt text.
+ * Product titles often contain markdown like *text* and emoji like 👗
+ * which make poor alt text for accessibility and SEO.
+ */
+export function sanitizeAltText(text: string): string {
+  return text
+    .replace(/[*_~`#>|]/g, "")        // markdown syntax
+    .replace(/!?\[([^\]]*)\]\([^)]*\)/g, "$1") // [text](url) -> text
+    .replace(/[\u{1F300}-\u{1F9FF}]/gu, "") // emoji and symbols
+    .replace(/\s+/g, " ")              // collapse whitespace
+    .trim();
+}
+
+/**
  * Carousel-ready image list for a product: primary image first, then by
  * position. Rows whose public URL can't be built are dropped.
+ * Alt text is sanitized to remove markdown and emoji for clean SEO output.
  */
 export function carouselImages(
   images: { storage_path: string; alt: string | null; position: number; is_primary: boolean }[],
   fallbackAlt: string,
 ): { src: string; alt: string }[] {
+  const cleanFallback = sanitizeAltText(fallbackAlt);
   return [...images]
     .sort(
       (a, b) =>
@@ -25,6 +41,7 @@ export function carouselImages(
     )
     .flatMap((img) => {
       const src = publicImageUrl(img.storage_path);
-      return src ? [{ src, alt: img.alt ?? fallbackAlt }] : [];
+      const rawAlt = img.alt ?? fallbackAlt;
+      return src ? [{ src, alt: sanitizeAltText(rawAlt) }] : [];
     });
 }

@@ -1,0 +1,24 @@
+# robots.txt - Taz Trends
+# https://www.taztrends.in
+
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /auth/
+
+# Allow AI crawlers (opt-in for AEO visibility)
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+# Sitemap
+Sitemap: https://www.taztrends.in/sitemap.xml
