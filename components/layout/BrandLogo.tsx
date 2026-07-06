@@ -5,7 +5,7 @@ export function BrandLogo({ href = "/" }: { href?: string }) {
     // eslint-disable-next-line @next/next/no-img-element
     <img
       src="/images/navbar/logo_navbar.png"
-      alt="Brand"
+      alt="Taz Trends"
       className="h-12 w-auto object-contain"
     />
   );
