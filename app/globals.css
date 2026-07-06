@@ -40,6 +40,7 @@
 
 body {
   @apply bg-white text-ink;
+  overflow-x: hidden;
 }
 
 /* ===== Layout ===== */
