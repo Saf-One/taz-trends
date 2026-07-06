@@ -71,40 +71,6 @@ export function CartView() {
   return (
     <div className="grid gap-6 md:gap-8 lg:grid-cols-3">
       <div className="lg:col-span-2 space-y-4">
-        {/* Free shipping banner */}
-        {remainingForFree > 0 ? (
-          <div className="rounded-lg border border-wine/20 bg-wine/5 p-3">
-            <div className="flex items-center gap-2 text-xs text-ink/70">
-              <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0 text-wine" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M5 12h14" />
-                <path d="M12 5l7 7-7 7" />
-              </svg>
-              <span>
-                Add items worth{" "}
-                <span className="font-medium text-wine">
-                  {formatPaise(remainingForFree)}
-                </span>{" "}
-                more for free shipping!
-              </span>
-            </div>
-            <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-wine/10">
-              <div
-                className="h-full rounded-full bg-wine transition-all duration-300"
-                style={{ width: `${freeProgressPct}%` }}
-              />
-            </div>
-          </div>
-        ) : (
-          <div className="rounded-lg border border-green-200 bg-green-50 p-3">
-            <div className="flex items-center gap-2 text-xs text-green-700">
-              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
-                <polyline points="22 4 12 14.01 9 11.01" />
-              </svg>
-              Your order qualifies for free shipping!
-            </div>
-          </div>
-        )}
 
         {/* Cart items */}
         <ul className="space-y-4">
